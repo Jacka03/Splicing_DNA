@@ -24,14 +24,12 @@ class HomeView(View):
     def post(self, request):
         data = request.POST
         gene = data.get('gene_input')
+        d1, d2 = cal(gene)
+
         context = {
             'gene': gene,
+            'd1': d1,
+            'd2': d2,
         }
-        # print(gene)
-        # d1, d2 = cal(gene)
-        # print(d1)
-        # print(d2)
-        # context = dict(d1.items() + context.items())
-        # return JsonResponse(context)
 
         return render(request, 'result.html', context)

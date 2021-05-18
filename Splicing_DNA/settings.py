@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -55,10 +55,12 @@ ROOT_URLCONF = 'Splicing_DNA.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # 'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
         'DIRS': [Path(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
+            'environment': 'Splicing_DNA.jinja2_env.Environment',  # default
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -67,6 +69,21 @@ TEMPLATES = [
             ],
         },
     },
+    # {
+    #     'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
+    #     # 'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
+    #     'DIRS': [Path(BASE_DIR, 'templates')],
+    #     'APP_DIRS': True,
+    #     'OPTIONS': {
+    #         # 'environment': 'jinja2_env.Environment',  # default
+    #         'context_processors': [
+    #             'django.template.context_processors.debug',
+    #             'django.template.context_processors.request',
+    #             'django.contrib.auth.context_processors.auth',
+    #             'django.contrib.messages.context_processors.messages',
+    #         ],
+    #     },
+    # },
 ]
 
 WSGI_APPLICATION = 'Splicing_DNA.wsgi.application'

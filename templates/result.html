@@ -5,9 +5,47 @@
     <title>result</title>
 </head>
 <body>
-<textarea>
-    {{ gene }}
-</textarea>
+<textarea  cols="110" rows="10">{{ gene }}</textarea>
+
+<hr>
+<table border="1" cellspacing="0">
+
+    <tr>
+        <th>no</th>
+        <th>gene</th>
+        <th>len</th>
+
+    </tr>
+
+    {% for i in d1 %}
+        <tr>
+            <td>
+                +{{ loop.index }}
+            </td>
+            <td>
+                {{ i }}&nbsp;&nbsp;
+            </td>
+            <td>
+                {{ loop.length }}
+            </td>
+        </tr>
+    {% endfor %}
+
+    {% for i in d2 %}
+        <tr>
+            <td>
+                -{{ loop.index }}
+            </td>
+            <td>
+                {{ i }}&nbsp;&nbsp;
+            </td>
+            <td>
+                {{ loop.length }}
+            </td>
+        </tr>
+    {% endfor %}
+
+</table>
 
 
 </body>
