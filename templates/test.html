@@ -5,18 +5,37 @@
     <title>Splicing_DNA</title>
 </head>
 <body>
-<form>
 
-
+<form {#action="#"#} method="post">
     <div>
-        <p>gene</p>
+        temperature:<label>
+        <input name="temperature" type="number" value="37.5">
+    </label><br>
+
+        Na:<label>
+        <input name="Na" type="number">
+    </label>
+{#        <br>#}
+{#        Or upload a file:<input type="file" name="gene_file">#}
+{#        <br>#}
+{#        reset<input type="reset">#}
     </div>
+
+    <br>
+
     <div>
-        <textarea name="gene_input" cols="110" rows="10"></textarea>
+        gene<br>
+        <label>
+            <textarea name="gene_input" cols="110" rows="10" id="gene"></textarea>
+        </label>
     </div>
     <br>
-    <button type="submit" formmethod="post">sub</button>
+
+    <button type="submit">submit</button>
 
 </form>
+
+
+
 </body>
 </html>
