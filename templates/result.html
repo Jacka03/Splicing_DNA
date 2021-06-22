@@ -27,13 +27,16 @@ length:<label>{{ gene_len }}</label><br>
     {% for i in d1 %}
         <tr>
             <td>
+{#                index#}
                 +{{ loop.index }}
             </td>
             <td>
+{#                gene#}
                 {{ i }}&nbsp;&nbsp;
             </td>
             <td>
-                {{ loop.length }}
+                gene.length
+{#                {{ length(i) }}#}
             </td>
         </tr>
     {% endfor %}
@@ -53,7 +56,5 @@ length:<label>{{ gene_len }}</label><br>
     {% endfor %}
 
 </table>
-
-
 </body>
 </html>

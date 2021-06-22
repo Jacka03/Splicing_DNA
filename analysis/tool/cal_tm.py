@@ -2,6 +2,7 @@ import numpy as np
 import math
 
 # from cal_util import show_w, get_gene, cal_tm, choose
+import analysis.tool.analysis
 
 
 def choose(tem_list, cou=1):
@@ -308,18 +309,19 @@ def gap(index_list):
     res_index2 = []
 
     dnaTable = {
-        "A":"T", "T":"A", "C":"G", "G":"C"
+        "A": "T", "T": "A", "C": "G", "G": "C"
     }
 
     gene_complement = ""
     for ele in gene:
         gene_complement += dnaTable[ele]
+
     coun = 0
     for i in range(0, len(index_list), 2):
         if i + 1 < len(index_list):
             coun += 1
             # res_index1.append([index_list[i][1], index_list[i + 1][2]])
-            if i < 21:
+            if i < 21:  # ?干，当时只是贪快，所以直接数了
                 # print(">Title of Sequence {0}".format(coun))
                 # print(gene[int(index_list[i][1]):int(index_list[i + 1][2])])
                 res_index1.append(gene[int(index_list[i][1]):int(index_list[i + 1][2])])
@@ -334,17 +336,19 @@ def gap(index_list):
                 # print(">Title of Sequence {0}".format(coun))
                 # print(gene_tem)
                 res_index2.append(gene_tem)
+
     # print(coun)
+
     return res_index1, res_index2
 
 
 def get_dict(gene_list1, gene_list2):
     tem_dic1 = {}
-    for i in range(1, len(gene_list1)+1):
-        tem_dic1['+str'.format(i)] = gene_list1[i-1]
+    for i in range(1, len(gene_list1) + 1):
+        tem_dic1['+str'.format(i)] = gene_list1[i - 1]
     tem_dic2 = {}
-    for i in range(1, len(gene_list2)+1):
-        tem_dic2['-str'.format(i)] = gene_list2[i-1]
+    for i in range(1, len(gene_list2) + 1):
+        tem_dic2['-str'.format(i)] = gene_list2[i - 1]
     return tem_dic1, tem_dic2
 
 
@@ -372,6 +376,14 @@ def cal(gene_t):
 
 
 # if __name__ == '__main__':
+#     import time
+#     start = time.time()
 #     gen = "CGTTTTAAAGGGCCCGCGCGTTGCCGCCCCCTCGGCCCGCCATGCTGCTATCCGTGCCGCTGCTGCTCGGCCTCCTCGGCCTGGCCGTCGCCGAGCCTGCCGTCTACTTCAAGGAGCAGTTTCTGGACGGAGACGGGTGGACTTCCCGCTGGATCGAATCCAAACACAAGTCAGATTTTGGCAAATTCGTTCTCAGTTCCGGCAAGTTCTACGGTGACGAGGAGAAAGATAAAGGTTTGCAGACAAGCCAGGATGCACGCTTTTATGCTCTGTCGGCCAGTTTCGAGCCTTTCAGCAACAAAGGCCAGACGCTGGTGGTGCAGTTCACGGTGAAACATGAGCAGAACATCGACTGTGGGGGCGGCTATGTGAAGCTGTTTCCTAATAGTTTGGACCAGACAGACATGCACGGAGACTCAGAATACAACATCATGTTTGGTCCCGACATCTGTGGCCCTGGCACCAAGAAGGTTCATGTCATCTTCAACTACAAGGGCAAGAACGTGCTGATCAACAAGGACATCCGTTGCAAGGATGATGAGTTTACACACCTGTACACACTGATTGTGCGGCCAGACAACACCTATGAGGTGAAGATTGACAACAGCCAGGTGGAGTCCGGCTCCTTGGAAGACGATTGGGACTTCCTGCCACC";
+#     r1, r2 = cal(gen)
+#     analysis.tool.analysis.analysis_all(r1, r2)
+#     end = time.time()
 #
-#     main(gen)
+#     print('Running time: {0}}s Seconds'.format(end - start))
+#     filename = 'write_data.txt'
+#     with open(filename, 'w') as f:
+#         f.write('Running time: {0}}s Seconds\n'.format(end - start))
