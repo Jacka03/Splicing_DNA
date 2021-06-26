@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
 
-from analysis.tool.analysis import analysis_all, analysis_two
+from analysis.tool.analysis import analysis_all, analysis_two, analysis_three
 from analysis.tool.cal_tm import cal
 
 
@@ -29,17 +29,15 @@ class HomeView(View):
         temp = data.get('temperature')
         Na = data.get('Na')
 
-        # var = request.FILES['gene_file']
-
-        # print(temp, Na)
-
-        d1, d2 = cal(gene)
-        analysis_two(d1, d2)
+        d1, d2, len1 = cal(gene)
+        # analysis_two(d1, d2, len1)
+        analysis_three(d1, d2, len1)
 
         context = {
             'gene_len': len(gene),
             'gene': gene,
             'd1': d1,
+            'lend1':len(d1),
             'd2': d2,
         }
 

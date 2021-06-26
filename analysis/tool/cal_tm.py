@@ -25,7 +25,7 @@ def choose(tem_list, cou=1):
     return tem_list
 
 
-def cal_tm(temp_gene):
+def cal_tm1(temp_gene):
     """
     计算一小段基因(temp_gene)的tm
     :param temp_gene:
@@ -60,6 +60,112 @@ def cal_tm(temp_gene):
         -22.2) + CGGC * (-27.2) + GCCG * (-24.4) + GGCC * (-19.9) - 2.8 + 4.1 - 1.4
     # TODO 钠离子浓度需要重新设置
     return (H * 1000) / (S + 1.987 * math.log10((10 ** -4) / 4)) - 273.15 + 16.6 * math.log10(1.2)
+
+
+def cal_gc(tem_gene):
+    # 计算一小片段中gc的含量
+    return (tem_gene.count("C") + tem_gene.count("G")) / len(tem_gene)
+
+
+def cal_tm(temp_gene):
+    """
+    计算一小段基因(temp_gene)的tm
+    :param temp_gene:
+    :return: 这段基因的tm
+    """
+    AATT = ATTA = TAAT = CAGT = GTCA = CTGA = GACT = CGGC = GCCG = GGCC = 0
+    for i in range(len(temp_gene) - 1):
+        if (temp_gene[i:i + 2] == 'AA') | (temp_gene[i:i + 2] == 'TT'):
+            AATT += 1
+        elif temp_gene[i:i + 2] == 'AT':
+            ATTA += 1
+        elif temp_gene[i:i + 2] == 'TA':
+            TAAT += 1
+        elif (temp_gene[i:i + 2] == 'CA') | (temp_gene[i:i + 2] == 'TG'):
+            CAGT += 1
+        elif (temp_gene[i:i + 2] == 'GT') | (temp_gene[i:i + 2] == 'AC'):
+            GTCA += 1
+        elif (temp_gene[i:i + 2] == 'CT') | (temp_gene[i:i + 2] == 'AG'):
+            CTGA += 1
+        elif (temp_gene[i:i + 2] == 'GA') | (temp_gene[i:i + 2] == 'TC'):
+            GACT += 1
+        elif temp_gene[i:i + 2] == 'CG':
+            CGGC += 1
+        elif temp_gene[i:i + 2] == 'GC':
+            GCCG += 1
+        elif (temp_gene[i:i + 2] == 'GG') | (temp_gene[i:i + 2] == 'CC'):
+            GGCC += 1
+
+    # H = AATT * (-7.9) + ATTA * (-7.2) + TAAT * (-7.2) + CAGT * (-8.5) + GTCA * (-8.4) + CTGA * (-7.8) + GACT * (
+    #     -8.2) + CGGC * (-10.6) + GCCG * (-9.8) + GGCC * (-8) + 0.1 + 2.3
+    # S = AATT * (-22.2) + ATTA * (-20.4) + TAAT * (-21.3) + CAGT * (-22.7) + GTCA * (-22.4) + CTGA * (-21) + GACT * (
+    #     -22.2) + CGGC * (-27.2) + GCCG * (-24.4) + GGCC * (-19.9) - 2.8 + 4.1 - 1.4
+
+    H = AATT * (-7.6) + ATTA * (-7.2) + TAAT * (-7.2) + CAGT * (-8.5) + GTCA * (-8.4) + CTGA * (-7.8) + GACT * (
+        -8.2) + CGGC * (-10.6) + GCCG * (-9.8) + GGCC * (-8.0) + 0.2 + 2.2
+    S = AATT * (-21.3) + ATTA * (-20.4) + TAAT * (-21.3) + CAGT * (-22.7) + GTCA * (-22.4) + CTGA * (-21.0) + GACT * (
+        -22.2) + CGGC * (-27.2) + GCCG * (-24.4) + GGCC * (-19.9) - 5.7 + 6.9 - 1.4
+
+
+    # TODO 钠离子浓度需要重新设置
+    # 当Na+ 浓度不是1 mol / L 时，就需要对其校正，并且C_t / 4
+    c_Mon = 0.005  # 输入浓度
+    c_Mg = 1.5e-3  #
+    c_K = 5.0e-2  # mol / L
+    c_Tris = 1.0e-2  # mol / L#
+    c_Na = 1e3  #
+    c_t = 2e-3  # mmol / L#
+
+    c_dNTP = 8.0e-4  # 脱氧核糖核苷三磷酸
+    # c_Mg = c_Mg - c_dNTP
+
+    c_primer = 0  # 引物
+    c_oligo = 0 # 寡核苷酸
+
+    kelvins = 273.15
+
+    a = 3.92e-5
+    b = -9.11e-6
+    c = 6.26e-5
+    d = 1.42e-5
+    e = -4.82e-4
+    f = 5.25e-4
+    g = 8.31e-5
+
+    f_GC = cal_gc(temp_gene)
+    n_bp = len(temp_gene)
+
+    tm = (H * 1000) / (S + 1.987 * math.log((c_t /1000) / 4)) + 16.6 * math.log(1.02)
+    # print(tm-kelvins)
+    # print(76.3+kelvins)
+    # tm = 76.3+kelvins
+
+    if c_Mon == 0:
+        tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
+                e + f * math.log(c_Mg) + g * (math.log(c_Mg) ** 2)) / (2 * (n_bp - 1))
+        return 1 / tem - kelvins
+    else:
+        R = math.sqrt(c_Mg) / c_Mon
+
+        if R < 0.22:
+            c_Mon = c_Na + c_K + c_Tris
+            tem = 1 / tm + (4.29 * f_GC - 3.95) *10e-5 * math.log(c_Mon) + 9.4e-6*(math.log(c_Mon))**2
+            return 1 / tem - kelvins
+        elif R < 6.0:
+
+            a = 3.92e-5*(0.843-0.352*math.sqrt(c_Mon) * math.log(c_Mon))
+            d = 1.42e-5*(1.279-4.03e-3*math.log(c_Mon)-8.03e-3*(math.log(c_Mon))**2)
+            g = 8.31e-5*(0.486-0.258*math.log(c_Mon)+5.25e-3*(math.log(c_Mon))**3)
+
+            tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
+                    e + f * math.log(c_Mg) + g * (math.log(c_Mg) ** 2)) / (2 * (n_bp - 1))
+            return 1 / tem - kelvins
+        else:
+
+            tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
+                    e + f * math.log(c_Mg) + g * (math.log(c_Mg) ** 2)) / (2 * (n_bp - 1))
+
+            return 1 / tem - kelvins
 
 
 def cal_all_tm(arr):
@@ -304,7 +410,8 @@ def overlap(index_list, tm_list):
     return gene_list
 
 
-def gap(index_list):
+def get_gene_list(index_list):
+    # 将每个片段返回
     res_index1 = []
     res_index2 = []
 
@@ -316,30 +423,36 @@ def gap(index_list):
     for ele in gene:
         gene_complement += dnaTable[ele]
 
+    # print(gene)
+    # print(gene_complement)
     coun = 0
     for i in range(0, len(index_list), 2):
         if i + 1 < len(index_list):
             coun += 1
-            # res_index1.append([index_list[i][1], index_list[i + 1][2]])
-            if i < 21:  # ?干，当时只是贪快，所以直接数了
-                # print(">Title of Sequence {0}".format(coun))
-                # print(gene[int(index_list[i][1]):int(index_list[i + 1][2])])
-                res_index1.append(gene[int(index_list[i][1]):int(index_list[i + 1][2])])
-    # print()
+            res_index1.append(gene[int(index_list[i][1]): int(index_list[i + 1][2])])
+
+    if len(index_list) % 2 != 0:  # 最后一片
+        coun += 1
+        res_index1.append(gene[int(index_list[-1][1]): int(index_list[-1][2])])
+
+    # 第一片
+    gene_tem = gene_complement[int(index_list[0][1]):int(index_list[1][2])]
+    # print(gene_tem[::-1])
+    res_index2.append(gene_tem[::-1])
+
     for i in range(1, len(index_list), 2):
         if i + 1 < len(index_list):
             coun += 1
-            # res_index2.append([index_list[i][1], index_list[i + 1][2]])
-            if i < 22:
-                gene_tem = gene_complement[int(index_list[i][1]):int(index_list[i + 1][2])]
-                gene_tem = gene_tem[::-1]
-                # print(">Title of Sequence {0}".format(coun))
-                # print(gene_tem)
-                res_index2.append(gene_tem)
+            gene_tem = gene_complement[int(index_list[i][1]):int(index_list[i + 1][2])]
+            res_index2.append(gene_tem[::-1])
 
+    if len(index_list) % 2 == 0:  # 最后一片
+        coun += 1
+        gene_tem = gene_complement[int(index_list[-1][1]):int(index_list[-1][2])]
+        res_index2.append(gene_tem[::-1])
     # print(coun)
-
     return res_index1, res_index2
+
 
 
 def get_dict(gene_list1, gene_list2):
@@ -366,13 +479,13 @@ def cal(gene_t):
     index, tm = cal_next_tm(float(np.mean(tm)))
     # 对整体遍历
     index = np.insert(index, 0, [0])
-    # print(len(index), len(tm))
+
     index, tm = iteration(index, tm)
     cut_of_index = overlap(index, tm)
-    # print("基因片段个数:{0}".format(len(cut_of_index)))
-    res1, res2 = gap(cut_of_index)
-    # get_dict(res1, res2)
-    return res1, res2
+    res1, res2 = get_gene_list(cut_of_index)
+
+    print("拼接前基因片段个数:{0}".format(len(cut_of_index)))
+    return res1, res2, len(cut_of_index)
 
 
 # if __name__ == '__main__':
