@@ -1,42 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Splicing_DNA</title>
-</head>
-<body>
-
-<form {#action="#"#} method="post">
-    <div>
-        temperature:<label>
-        <input name="temperature" type="number" value="37.5">
-    </label><br>
-
-        Na:<label>
-        <input name="Na" type="number">
-    </label>
-{#        <br>#}
-{#        Or upload a file:<input type="file" name="gene_file">#}
-{#        <br>#}
-{#        reset<input type="reset">#}
-    </div>
-
+    <head>
+        <meta charset="UTF-8">
+        <title>Splicing_DNA</title>
+    </head>
     <br>
+    <body>
 
-    <div>
-        gene<br>
-        <label>
-{#            TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA#}
-            <textarea name="gene_input" cols="110" rows="10" id="gene">TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA</textarea>
-        </label>
-    </div>
-    <br>
+        <form {#action="#"#} method="post">
+            <table border="1" cellspacing="0">
+                <tr>
+                    <td>
+                        temperature
+                    </td>
+                    <td>
+                        <input name="temperature" type="number" value="37.5"> &#176;C
+                    </td>
+                </tr>
 
-    <button type="submit">submit</button>
+                <tr>
+                    <td>
+                        Na<sup>+</sup>
+                    </td>
+                    <td>
+                        <input name="Na" type="number" value="1000"> mM
+                    </td>
+                </tr>
 
-</form>
+                <tr>
+                    <td>
+                        K<sup>+</sup>
+                    </td>
+                    <td>
+                        <input name="K" type="number"> mM
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Mg<sup>2+</sup>
+                    </td>
+                    <td>
+                        <input name="Mg" type="number"> mM
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Mon<sup>2+</sup>
+                    </td>
+                    <td>
+                        <input name="Mon" type="number"> mM
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        dNTPs<sup>2+</sup>
+                    </td>
+                    <td>
+                        <input name="dNTPs" type="number"> mM
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        Tris<sup>2+</sup>
+                    </td>
+                    <td>
+                        <input name="dNTPs" type="number"> mM
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        t<sup>2+</sup>
+                    </td>
+                    <td>
+                        <input name="dNTPs" type="number"> mM
+                    </td>
+                </tr>
+
+            </table>
+            <br>
+
+            <div>
+                gene<br>
+                <label>
+                    {#            TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA#}
+                    <textarea name="gene_input" cols="110" rows="10" id="gene">TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA</textarea>
+                </label>
+            </div>
+            <br>
+
+            <button type="submit">submit</button>
+
+        </form>
 
 
-
-</body>
+    </body>
 </html>
