@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
 
-from analysis.tool.analysis import analysis_all, analysis_two, analysis_three
+from analysis.tool.analysis import Analysis
 from analysis.tool.cal_tm import cal
 
 
@@ -31,7 +31,10 @@ class HomeView(View):
 
         d1, d2, len1 = cal(gene)
         # analysis_two(d1, d2, len1)
-        analysis_three(d1, d2, len1)
+        # analysis_three(d1, d2, len1)
+        analy = Analysis(d1, d2, len1)
+        analy.analysis_two()
+        # analy.analysis_three()
 
         context = {
             'gene_len': len(gene),
