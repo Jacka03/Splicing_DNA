@@ -29,19 +29,19 @@ class HomeView(View):
         temp = data.get('temperature')
         Na = data.get('Na')
 
-        d1, d2, len1 = cal(gene)
-        # analysis_two(d1, d2, len1)
-        # analysis_three(d1, d2, len1)
-        analy = Analysis(d1, d2, len1)
+        list_g1, list_g2, len1 = cal(gene)
+        # analysis_two(list_g1, list_g2, len1)
+        # analysis_three(list_g1, list_g2, len1)
+        analy = Analysis(list_g1, list_g2, len1)
         analy.analysis_two()
         # analy.analysis_three()
 
         context = {
             'gene_len': len(gene),
             'gene': gene,
-            'd1': d1,
-            'lend1':len(d1),
-            'd2': d2,
+            'list_g1': list_g1,
+            'lend1':len(list_g1),
+            'list_g2': list_g2,
         }
 
         return render(request, 'result.html', context)

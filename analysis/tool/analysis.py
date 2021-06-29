@@ -13,11 +13,14 @@ class Analysis:
 
         self.len_g1 = len(list_g1)  # 上面的基因片段数量
         self.len_g2 = len(list_g2)  # 下面的基因片段数量
-        self.len_gene = len(self.gene_list)
+        self.len_gene = self.len_g1 + self.len_g2
 
         self.len1 = len1  # 拼接前的基因片段数
 
+        # self.first_check = 1e-9
+
     def get_strands_tube_tow(self):
+        # 获取试管中只有两条基因片段的所有情况
         tubes = []
         count = 1
         for i in range(self.len_gene):
@@ -25,8 +28,7 @@ class Analysis:
                 strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): 1e-8,  # TODO
                            Strand(self.gene_list[j], name="t{0}:R{1}".format(count, j + 1)): 1e-8}
 
-                tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=2),
-                                  name='t{0}'.format(count)))  # complexes defaults to [A, B]
+                tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=2), name='t{0}'.format(count)))
                 count += 1
         return tubes
 
@@ -48,7 +50,7 @@ class Analysis:
         return tem_err_list
 
     def analysis_two(self):
-        my_model = Model(material='dna', celsius=37)
+        my_model = Model(material='dna', celsius=37)  # TODO 温度
         tubes = self.get_strands_tube_tow()  # 得到每个试管中都有两条DNA单链
         tube_results = tube_analysis(tubes=tubes, model=my_model)
         # print(tube_results)
@@ -80,7 +82,7 @@ class Analysis:
                     error.append(k)
                     print("验证:{0},{1}".format(t1, t2))
                     tem_err_list = self.get_tube(t1)
-                    tem_err_list = tem_err_list + self.get_tube(t2)
+                    tem_err_list.extend(self.get_tube(t2))
 
                     if self.verification_two(tem_err_list):
                         error_end.append(k)
@@ -88,6 +90,7 @@ class Analysis:
         #     return False
         print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
         print("出错的{0}".format(error))
+        print("最终检测还是出错的{0}".format(error_end))
         print("浓度大于1e-9数{0}".format(k_cou))
         print('总数{0}'.format(len(new_conc)))
 
@@ -146,8 +149,6 @@ class Analysis:
         return tubes
 
     def analysis_three(self):
-        # gene_list = self.list_g1 + self.list_g2
-
         my_model = Model(material='dna', celsius=37)
         tubes = self.get_strands_tube_three()  # 得到每个试管中都有两条DNA单链
         tube_results = tube_analysis(tubes=tubes, model=my_model)
@@ -180,13 +181,15 @@ class Analysis:
                     # 添加验证
                     print("验证:{0},{1},{2}".format(t1, t2, t3))
                     tem_err_list = self.get_tube(t1)
-                    tem_err_list = tem_err_list + self.get_tube(t2)
-                    tem_err_list = tem_err_list + self.get_tube(t3)
+                    tem_err_list.extend(self.get_tube(t2))
+                    tem_err_list.extend(self.get_tube(t3))
 
-                    self.verification_two(tem_err_list)
+                    if self.verification_two(tem_err_list):
+                        error_end.append(k)
 
         print("目标:{0},list1:{1},list2:{2}".format(int(self.len1 / 2), self.len_g1, self.len_g2))
         print("出错的:{0},{1}".format(len(error), error))
+        print("最终检测还是出错的{0}".format(error_end))
         print("浓度大于1e-9数:{0}".format(k_cou))
         print('总数:{0}'.format(len(new_conc)))
 
