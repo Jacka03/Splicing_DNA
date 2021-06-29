@@ -3,10 +3,12 @@ from django.shortcuts import render
 from django.views.generic import View
 
 from analysis.tool.analysis import Analysis
-from analysis.tool.cal_tm import cal
+# from analysis.tool.cal_tm import cal
 
 
 # Create your views here.
+from analysis.tool.splicing import Splicing
+
 
 class AnalysisView(View):
 
@@ -29,7 +31,9 @@ class HomeView(View):
         temp = data.get('temperature')
         Na = data.get('Na')
 
-        list_g1, list_g2, len1 = cal(gene)
+        splic = Splicing(gene)
+        list_g1, list_g2, len1 = splic.cal()
+        # list_g1, list_g2, len1 = cal(gene)
         # analysis_two(list_g1, list_g2, len1)
         # analysis_three(list_g1, list_g2, len1)
         analy = Analysis(list_g1, list_g2, len1)

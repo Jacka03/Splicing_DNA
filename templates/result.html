@@ -24,7 +24,7 @@ length:<label>{{ gene_len }}</label><br>
 
     </tr>
 
-    {% for i in d1 %}
+    {% for i in list_g1 %}
         <tr>
             <td>
 {#                index#}
@@ -41,7 +41,7 @@ length:<label>{{ gene_len }}</label><br>
         </tr>
     {% endfor %}
 
-    {% for i in d2 %}
+    {% for i in list_g2 %}
         <tr>
             <td>
                 L{{ loop.index+lend1 }}
