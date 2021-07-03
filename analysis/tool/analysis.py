@@ -3,10 +3,6 @@ from nupack import *
 from nupack import SetSpec, RawStrand, RawComplex, Strand, Complex, Tube, tube_analysis, \
     Model, complex_analysis, complex_concentrations, Domain, TargetStrand, analysis
 
-from analysis.tool import splicing
-from analysis.tool.splicing import Splicing
-
-
 class Analysis:
 
     def __init__(self, list_g1, list_g2, len1):
@@ -20,7 +16,12 @@ class Analysis:
 
         self.len1 = len1  # 拼接前的基因片段数
 
-        # self.first_check = 1e-9
+        self.c_gene = 1e-8  # 检验的时候反应的基因序列的浓度
+
+        self.first_check = 1e-9  # 第一次验证时的浓度
+        self.second_check = 1e-14  # 第二次验证时的浓度
+        self.temp = 37  # 验证 时的温度
+
 
     def get_more_info(self):
         info = []  #
@@ -40,8 +41,8 @@ class Analysis:
         count = 1
         for i in range(self.len_gene):
             for j in range(i, self.len_gene):
-                strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): 1e-8,  # TODO
-                           Strand(self.gene_list[j], name="t{0}:R{1}".format(count, j + 1)): 1e-8}
+                strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): self.c_gene,
+                           Strand(self.gene_list[j], name="t{0}:R{1}".format(count, j + 1)): self.c_gene}
 
                 tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=2), name='t{0}'.format(count)))
                 count += 1
@@ -65,7 +66,7 @@ class Analysis:
         return tem_err_list
 
     def analysis_two(self):
-        my_model = Model(material='dna', celsius=37)  # TODO 温度
+        my_model = Model(material='dna', celsius=self.temp)  # 温度
         tubes = self.get_strands_tube_tow()  # 得到每个试管中都有两条DNA单链
         tube_results = tube_analysis(tubes=tubes, model=my_model)
         # print(tube_results)
@@ -86,7 +87,7 @@ class Analysis:
 
         for k, v in new_conc:
             # print(v)
-            if k.count("+") == 1 and v > 2e-9:  # TODO 将浓度换成输入的浓度
+            if k.count("+") == 1 and v > self.first_check:  #  将浓度换成输入的浓度
                 # print(k, v)
                 k_cou += 1
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
@@ -102,7 +103,7 @@ class Analysis:
 
                     if self.verification_two(tem_err_list):
                         error_end.append(k)
-            elif v < 2e-10:  # todo
+            elif v < self.first_check:  #
                 break
         # if len(error_end):
         #     return False
@@ -121,14 +122,14 @@ class Analysis:
             for j in range(len(list1[i])):
                 if j == 0:
                     set1.add(list1[i][j])
-                    strands[Strand(self.gene_list[list1[i][j] - 1], name="E:{1}:{0}".format(list1[i][j], i))] = 2e-8  # TODO 改正浓度
+                    strands[Strand(self.gene_list[list1[i][j] - 1], name="E:{1}:{0}".format(list1[i][j], i))] = self.c_gene * 2  # 改正浓度
                 elif Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j])) in strands.keys():
-                    strands[Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j]))] = 2e-8
+                    strands[Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j]))] = self.c_gene * 2
                 else:
-                    strands[Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j]))] = 1e-8
+                    strands[Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j]))] = self.c_gene
 
         tube = Tube(strands=strands, complexes=SetSpec(max_size=len(list1)), name="test")
-        my_model = Model(material='dna', celsius=37)
+        my_model = Model(material='dna', celsius=self.temp)
         tube_results = tube_analysis(tubes=[tube], model=my_model)
         all_conc = {}
         # print(tube_results)
@@ -137,7 +138,7 @@ class Analysis:
             all_conc[my_complex.name] = conc
             name = my_complex.name[1:-1]
             # if name.count("E") == 2: #
-            if name.count("E") == len(list1) and conc > 1e-14:  # TODO
+            if name.count("E") == len(list1) and conc > self.second_check:  #
                 name_list = name.split("+")
                 set_t = set()
                 for i in range(len(list1)):
@@ -158,16 +159,16 @@ class Analysis:
         for i in range(self.len_gene):
             for j in range(i, self.len_gene):
                 for k in range(j, self.len_gene):
-                    strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): 1e-8,
-                               Strand(self.gene_list[j], name="t{0}:M{1}".format(count, j + 1)): 1e-8,  # TODO
-                               Strand(self.gene_list[k], name="t{0}:R{1}".format(count, k + 1)): 1e-8}
-                    tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=3),  # TODO max_size,使用变量代替？
+                    strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): self.c_gene,
+                               Strand(self.gene_list[j], name="t{0}:M{1}".format(count, j + 1)): self.c_gene,
+                               Strand(self.gene_list[k], name="t{0}:R{1}".format(count, k + 1)): self.c_gene}
+                    tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=3),  # max_size,使用变量代替？
                                       name='t{0}'.format(count)))  # complexes defaults to [A, B]
                     count += 1
         return tubes
 
     def analysis_three(self):
-        my_model = Model(material='dna', celsius=37)
+        my_model = Model(material='dna', celsius=self.temp)
         tubes = self.get_strands_tube_three()  # 得到每个试管中都有两条DNA单链
         tube_results = tube_analysis(tubes=tubes, model=my_model)
         # print(tube_results.complexes)
@@ -183,7 +184,7 @@ class Analysis:
         error_end = []  # 经过校验后还是错配的
 
         for k, v in new_conc:
-            if k.count("+") == 2 and v > 1e-9:  # TODO 将浓度换成输入的浓度
+            if k.count("+") == 2 and v > self.first_check:  # 将浓度换成输入的浓度
                 # print(k, v)
                 k_cou += 1
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
@@ -215,17 +216,17 @@ class Analysis:
         name = 65
         strands = {}
         for strand in self.list_g1:
-            strands[Strand(strand, name=chr(name))] = 1e-8
+            strands[Strand(strand, name=chr(name))] = self.c_gene
             name += 1
         for strand in self.list_g2:
-            strands[Strand(strand, name=chr(name))] = 1e-8
+            strands[Strand(strand, name=chr(name))] = self.c_gene
             name += 1
         return strands
 
     def analysis_all(self):
         count = self.len_g1 + self.len_g2
         strands = self.get_strands()
-        my_model = Model(material='dna', celsius=37)
+        my_model = Model(material='dna', celsius=self.temp)
         t1 = Tube(strands=strands, complexes=SetSpec(max_size=count), name='t1')  # complexes defaults to [A, B]
         tube_results = tube_analysis(tubes=[t1], model=my_model)
         print(tube_results)
