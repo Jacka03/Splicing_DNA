@@ -21,40 +21,43 @@ length:<label>{{ gene_len }}</label><br>
         <th>lable</th>
         <th>Oligonucleotide sequence (5’ to 3’)</th>
         <th>len</th>
+{#        <th>Tm</th>#}
 
     </tr>
 
-    {% for i in list_g1 %}
+    {% for i in info %}
         <tr>
-            <td>
-{#                index#}
-                F{{ loop.index }}
-            </td>
-            <td>
-{#                gene#}
-                {{ i }}&nbsp;&nbsp;
-            </td>
-            <td>
-                gene.length
-{#                {{ length(i) }}#}
-            </td>
+        <td>
+            {{ i[0] }}
+        </td>
+        <td>
+            {{ i[1] }}
+        </td>
+        <td>
+            {{ i[2] }}
+        </td>
+{#        <td>#}
+{#            {{ i[3] }}#}
+{#        </td>#}
         </tr>
     {% endfor %}
 
-    {% for i in list_g2 %}
-        <tr>
-            <td>
-                L{{ loop.index+lend1 }}
-            </td>
-            <td>
-                {{ i }}&nbsp;&nbsp;
-            </td>
-            <td>
-                {{ loop.length }}
-            </td>
-        </tr>
-    {% endfor %}
+{#    {% for i in list_g2 %}#}
+{#        <tr>#}
+{#            <td>#}
+{#                L{{ loop.index+lend1 }}#}
+{#            </td>#}
+{#            <td>#}
+{#                {{ i }}&nbsp;&nbsp;#}
+{#            </td>#}
+{#            <td>#}
+{#                {{ loop.length }}#}
+{#            </td>#}
+{#        </tr>#}
+{#    {% endfor %}#}
 
 </table>
+
+
 </body>
 </html>

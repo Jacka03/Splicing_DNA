@@ -1,3 +1,4 @@
+
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
@@ -28,24 +29,30 @@ class HomeView(View):
     def post(self, request):
         data = request.POST
         gene = data.get('gene_input')
-        temp = data.get('temperature')
-        Na = data.get('Na')
+        input_info = {
+            'temp': data.get('temperature'),
+            'Na': data.get('Na'),
+            'K': data.get('K'),
+            'Mg': data.get('Mg'),
+            'Mon': data.get('Mon'),
+            'dNTPs': data.get('dNTPs'),
+            'Tris': data.get('Tris'),
+            't': data.get('t'),
+        }
 
-        splic = Splicing(gene)
+        splic = Splicing(gene, input_info)
         list_g1, list_g2, len1 = splic.cal()
-        # list_g1, list_g2, len1 = cal(gene)
-        # analysis_two(list_g1, list_g2, len1)
-        # analysis_three(list_g1, list_g2, len1)
+
         analy = Analysis(list_g1, list_g2, len1)
+        info = analy.get_more_info()
         analy.analysis_two()
-        # analy.analysis_three()
+        analy.analysis_three()
 
         context = {
-            'gene_len': len(gene),
-            'gene': gene,
-            'list_g1': list_g1,
-            'lend1':len(list_g1),
-            'list_g2': list_g2,
+            'gene_len': len(gene),  # 输入的序列长度
+            'gene': gene,  # 输入的序列
+            'info': info,
+
         }
 
         return render(request, 'result.html', context)

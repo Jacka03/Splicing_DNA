@@ -3,6 +3,9 @@ from nupack import *
 from nupack import SetSpec, RawStrand, RawComplex, Strand, Complex, Tube, tube_analysis, \
     Model, complex_analysis, complex_concentrations, Domain, TargetStrand, analysis
 
+from analysis.tool import splicing
+from analysis.tool.splicing import Splicing
+
 
 class Analysis:
 
@@ -18,6 +21,18 @@ class Analysis:
         self.len1 = len1  # 拼接前的基因片段数
 
         # self.first_check = 1e-9
+
+    def get_more_info(self):
+        info = []  #
+        for i, tem_gene in enumerate(self.list_g1):  # TODO 全部更换成这样
+            ind = 'F{0}'.format(i+1)
+            info.append([ind, tem_gene, len(tem_gene)])
+
+        for i, tem_gene in enumerate(self.list_g2):
+            ind = 'L{0}'.format(self.len_g1+i+1)
+            info.append([ind, tem_gene, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
+
+        return info
 
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
@@ -61,7 +76,7 @@ class Analysis:
                 # if my_complex.name not in all_conc:
                 all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
 
-        new_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)
+        new_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
         error = []  # 怀疑是错配的
         k_cou = 0  # 记录浓度大于某个值的
@@ -70,6 +85,7 @@ class Analysis:
         error_end = []  # 经过校验后还是错配的
 
         for k, v in new_conc:
+            # print(v)
             if k.count("+") == 1 and v > 2e-9:  # TODO 将浓度换成输入的浓度
                 # print(k, v)
                 k_cou += 1
@@ -86,6 +102,8 @@ class Analysis:
 
                     if self.verification_two(tem_err_list):
                         error_end.append(k)
+            elif v < 2e-10:  # todo
+                break
         # if len(error_end):
         #     return False
         print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
@@ -119,7 +137,7 @@ class Analysis:
             all_conc[my_complex.name] = conc
             name = my_complex.name[1:-1]
             # if name.count("E") == 2: #
-            if name.count("E") == len(list1) and conc > 1e-14:  #
+            if name.count("E") == len(list1) and conc > 1e-14:  # TODO
                 name_list = name.split("+")
                 set_t = set()
                 for i in range(len(list1)):

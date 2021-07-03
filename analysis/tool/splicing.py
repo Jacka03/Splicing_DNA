@@ -12,15 +12,12 @@ def show_w(x, y, head):
     plt.show()
 
 class Splicing:
-    def __init__(self, gene):
+    def __init__(self, gene, input_info):
         self.gene = gene
         self.min_len = 15
         self.max_len = 35
         self.count = 20
-
-    def cal_gc(self, tem_gene):
-        # 计算一小片段中gc的含量
-        return (tem_gene.count("C") + tem_gene.count("G")) / len(tem_gene)
+        self.input_info = input_info  # 各种离子信息
 
     def cal_tm(self, temp_gene):
         """
@@ -51,11 +48,6 @@ class Splicing:
             elif (temp_gene[i:i + 2] == 'GG') | (temp_gene[i:i + 2] == 'CC'):
                 GGCC += 1
 
-        # H = AATT * (-7.9) + ATTA * (-7.2) + TAAT * (-7.2) + CAGT * (-8.5) + GTCA * (-8.4) + CTGA * (-7.8) + GACT * (
-        #     -8.2) + CGGC * (-10.6) + GCCG * (-9.8) + GGCC * (-8) + 0.1 + 2.3
-        # S = AATT * (-22.2) + ATTA * (-20.4) + TAAT * (-21.3) + CAGT * (-22.7) + GTCA * (-22.4) + CTGA * (-21) + GACT * (
-        #     -22.2) + CGGC * (-27.2) + GCCG * (-24.4) + GGCC * (-19.9) - 2.8 + 4.1 - 1.4
-
         H = AATT * (-7.6) + ATTA * (-7.2) + TAAT * (-7.2) + CAGT * (-8.5) + GTCA * (-8.4) + CTGA * (-7.8) + GACT * (
             -8.2) + CGGC * (-10.6) + GCCG * (-9.8) + GGCC * (-8.0) + 0.2 + 2.2
         S = AATT * (-21.3) + ATTA * (-20.4) + TAAT * (-21.3) + CAGT * (-22.7) + GTCA * (-22.4) + CTGA * (
@@ -64,12 +56,19 @@ class Splicing:
 
         # TODO 钠离子浓度需要重新设置
         # 当Na+ 浓度不是1 mol / L 时，就需要对其校正，并且C_t / 4
-        c_Mon = 0.005  # 输入浓度
-        c_Mg = 1.5e-3  #
-        c_K = 5.0e-2  # mol / L
-        c_Tris = 1.0e-2  # mol / L#
-        c_Na = 1e3  #
-        c_t = 2e-3  # mmol / L#
+        # c_Mon = 0.005  # 输入浓度
+        # c_Mg = 1.5e-3  #
+        # c_K = 5.0e-2  # mol / L
+        # c_Tris = 1.0e-2  # mol / L#
+        # c_Na = 1e3  #
+        # c_t = 2e-3  # mmol / L#
+
+        c_Mon = self.input_info['Mon']  # 输入浓度
+        c_Mg = self.input_info['Mg']  #
+        c_K = self.input_info['K']  # mol / L
+        c_Tris = self.input_info['Tris']  # mol / L#
+        c_Na = self.input_info['Na']  #
+        c_t = self.input_info['t']  # mmol / L#
 
         c_dNTP = 8.0e-4  # 脱氧核糖核苷三磷酸
         # c_Mg = c_Mg - c_dNTP
@@ -87,13 +86,10 @@ class Splicing:
         f = 5.25e-4
         g = 8.31e-5
 
-        f_GC = self.cal_gc(temp_gene)
+        f_GC = (temp_gene.count("C") + temp_gene.count("G")) / len(temp_gene)  # 计算一小片段中gc的含量
         n_bp = len(temp_gene)
 
         tm = (H * 1000) / (S + 1.987 * math.log((c_t / 1000) / 4)) + 16.6 * math.log(1.02)
-        # print(tm-kelvins)
-        # print(76.3+kelvins)
-        # tm = 76.3+kelvins
 
         if c_Mon == 0:
             tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
@@ -166,7 +162,6 @@ class Splicing:
         :return:
         """
         result = self.cal_first_tm(tm_mea)
-
         result = self.choose(result, self.count)
         result = np.delete(result, -1, axis=1)  # 删除最后一列
 
@@ -208,12 +203,11 @@ class Splicing:
             answer1_tem = self.choose(answer1_tem)
             if fir_ans_tem[0, -1] > answer1_tem[0, -1]:
                 fir_ans_tem = answer1_tem
-        index111 = np.array(fir_ans_tem[0][:-1:2])
-        tm111 = np.array(fir_ans_tem[0][1::2])
+        index_res = np.array(fir_ans_tem[0][:-1:2])
+        tm_res = np.array(fir_ans_tem[0][1::2])
 
-        show_w(index111, tm111, "greedy")
-
-        return index111, tm111
+        show_w(index_res, tm_res, "greedy")
+        return index_res, tm_res
 
     def cal_all_tm(self, arr):
         """
@@ -285,7 +279,9 @@ class Splicing:
 
             flag.append(best_std)
             # show_w(index_list[1:], tm_list, "d")
+
         show_w(index_list[1:], tm_list, "iteration")
+
         return index_list, tm_list
 
     def overlap(self, index_list, tm_list):
@@ -429,6 +425,6 @@ class Splicing:
         index, tm = self.iteration(index, tm)
         cut_of_index = self.overlap(index, tm)
         res1, res2 = self.get_gene_list(cut_of_index)
-
         print("拼接前基因片段个数:{0}".format(len(cut_of_index)))
+
         return res1, res2, len(cut_of_index)
