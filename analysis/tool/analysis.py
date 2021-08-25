@@ -23,17 +23,17 @@ class Analysis:
         self.temp = 37  # 验证 时的温度
 
 
-    def get_more_info(self):
-        info = []  #
-        for i, tem_gene in enumerate(self.list_g1):  # TODO 全部更换成这样
-            ind = 'F{0}'.format(i+1)
-            info.append([ind, tem_gene, len(tem_gene)])
-
-        for i, tem_gene in enumerate(self.list_g2):
-            ind = 'L{0}'.format(self.len_g1+i+1)
-            info.append([ind, tem_gene, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
-
-        return info
+    # def get_more_info(self):
+    #     info = []  #
+    #     for i, tem_gene in enumerate(self.list_g1):  # TODO 全部更换成这样
+    #         ind = 'F{0}'.format(i+1)
+    #         info.append([ind, tem_gene, len(tem_gene)])
+    #
+    #     for i, tem_gene in enumerate(self.list_g2):
+    #         ind = 'L{0}'.format(self.len_g1+i+1)
+    #         info.append([ind, tem_gene, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
+    #
+    #     return info
 
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
@@ -88,6 +88,7 @@ class Analysis:
         for k, v in new_conc:
             # print(v)
             if k.count("+") == 1 and v > self.first_check:  #  将浓度换成输入的浓度
+                # TODO 出现很多重复的，（试管名字不一样，但是序列时一样的）
                 # print(k, v)
                 k_cou += 1
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
@@ -97,12 +98,15 @@ class Analysis:
 
                 if abs(t1 - t2) - self.len_g1 not in [0, 1]:  # 错配
                     error.append(k)
+
                     print("验证:{0},{1}".format(t1, t2))
+                    print(k, v)
                     tem_err_list = self.get_tube(t1)
                     tem_err_list.extend(self.get_tube(t2))
 
                     if self.verification_two(tem_err_list):
                         error_end.append(k)
+
             elif v < self.first_check:  #
                 break
         # if len(error_end):

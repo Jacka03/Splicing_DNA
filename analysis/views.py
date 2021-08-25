@@ -1,4 +1,4 @@
-
+import numpy as np
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
@@ -29,24 +29,27 @@ class HomeView(View):
     def post(self, request):
         data = request.POST
         gene = data.get('gene_input')
+        # gene = gene[: 440]
         input_info = {
-            'temp': data.get('temperature'),
-            'Na': data.get('Na'),
-            'K': data.get('K'),
-            'Mg': data.get('Mg'),
-            'Mon': data.get('Mon'),
-            'dNTPs': data.get('dNTPs'),
-            'Tris': data.get('Tris'),
-            't': data.get('t'),
+
+            'K': float(data.get('K')),
+            'Mg': float(data.get('Mg')),
+            'dNTPs': float(data.get('dNTPs')),
+            'Tris': float(data.get('Tris')),
+            'oligo': float(data.get('oligo')),
+            'primer': float(data.get('primer')),
         }
+        print(len(gene))
+        print(input_info)
 
         splic = Splicing(gene, input_info)
-        list_g1, list_g2, len1 = splic.cal()
+        list_g1, list_g2, len1, info = splic.cal()
 
-        analy = Analysis(list_g1, list_g2, len1)
-        info = analy.get_more_info()
-        analy.analysis_two()
-        analy.analysis_three()
+        # analy = Analysis(list_g1, list_g2, len1)
+        # info = analy.get_more_info()
+        # analy.analysis_two()
+        # analy.analysis_three()
+
 
         context = {
             'gene_len': len(gene),  # 输入的序列长度

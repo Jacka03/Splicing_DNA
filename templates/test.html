@@ -1,102 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Splicing_DNA</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <title>Splicing_DNA</title>
+
+    <style type="text/css">
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .input {
+            width: 50px;
+        }
+
+        .mydiv {
+            position: relative;
+            left: 50px;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function ch1(tag) {
+            var a = document.getElementById("1");
+            if (tag === 'yes') {
+                a.style.display = "block";
+            } else {
+                a.style.display = "none";
+            }
+        }
+
+        function ch(tag) {
+            var a = document.getElementById("0");
+            if (tag === 'yes') {
+                a.style.display = "block";
+            } else {
+                a.style.display = "none";
+            }
+        }
+
+    </script>
+</head>
+
+<br>
+<body>
+
+<form {#action="#" #} method="post">
+    <h3>address</h3>
+    <div class="mydiv">
+        email:<input name="email" type="email">
+    </div>
+    <h3>Gene infrmation</h3>
+    <div class="mydiv">
+        Name:<input name="name"><br><br>
+
+        description:<textarea name="description" rows="6" cols="50" style="vertical-align:top"></textarea><br>
+        <br>
+        DNA seq
+        <textarea name="gene_input" cols="110" rows="10" id="gene" style="vertical-align: top">TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA</textarea>
+
+    </div>
+    <h3>parameters for gene synthesis</h3>
+    <div class="mydiv">
+        <table border="1" cellspacing="0">
+
+            <tr>
+                <th>
+                    ion
+                </th>
+                <th>
+                    concentration
+                </th>
+            </tr>
+
+            <tr>
+                <td>
+                    Na<sup>+</sup> /K<sup>+</sup>(1-1000mM)
+                </td>
+                <td>
+                    <input class="input" name="K" type="number" value="50"> mM
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Mg<sup>2+</sup> (1-1000mM)
+                </td>
+                <td>
+                    <input class="input" name="Mg" type="number" value="8"> mM
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    dNTPs (1-1000mM)
+                </td>
+                <td>
+                    <input class="input" name="dNTPs" type="number" value="4"> mM
+                </td>
+            </tr>
+
+             <tr>
+                <td>
+                    Tris<sup>2+</sup> (1-1000mM)
+                </td>
+                <td>
+                    <input class="input" name="Tris" type="number" value="10"> mM
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    oligo (0.1-1000nM)
+                </td>
+                <td>
+                    <input class="input" name="oligo" type="number" value="10"> nM
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    primer (0.1-1000nM)
+                </td>
+                <td>
+                    <input class="input" name="primer" type="number" value="400"> nM
+                </td>
+            </tr>
+{#            <tr>#}
+{#                <td>#}
+{#                    temperature#}
+{#                </td>#}
+{#                <td>#}
+{#                    <input class="input" name="temperature" type="number" value="37.5"> &#176;C#}
+{#                </td>#}
+{#            </tr>#}
+
+        </table>
+        <br>
+
+    </div>
+    <h3>Is the gene is too long </h3>
+    <div class="mydiv">
+        <input name="choose" onclick="ch('no')" type="radio" value="no" checked>no
+        <input name="choose" onclick="ch('yes')" type="radio" value="yes">yes
+    </div>
+    <div id="0" class="mydiv" style="display: none">
+        How many parts does it need to be divided into?<br>
+        <div class="mydiv">
+            <input name="choose1" onclick="ch1('no')" type="radio" value="no" checked>default
+            <input name="choose1" onclick="ch1('yes')" type="radio" value="yes">custom
+        </div>
+
+        <div id="1" style="display: none">
+
+            <input class="input" name="number" type="number">
+        </div>
+
+    </div>
     <br>
-    <body>
+    <h3>Is verification required</h3>
+    <div class="mydiv">
+        <input name="veri" type="radio" value="no" checked>no
+        <input name="veri" type="radio" value="yes">yes
+    </div>
+    <br>
 
-        <form {#action="#"#} method="post">
-            <table border="1" cellspacing="0">
-                <tr>
-                    <td>
-                        temperature
-                    </td>
-                    <td>
-                        <input name="temperature" type="number" value="37.5"> &#176;C
-                    </td>
-                </tr>
+    <div class="mydiv">
 
-                <tr>
-                    <td>
-                        Na<sup>+</sup>
-                    </td>
-                    <td>
-                        <input name="Na" type="number" value="1000"> mM
-                    </td>
-                </tr>
+        <button type="submit">submit</button>
+    </div>
 
-                <tr>
-                    <td>
-                        K<sup>+</sup>
-                    </td>
-                    <td>
-                        <input name="K" type="number" value=""> mM
-                    </td>
-                </tr>
+</form>
 
-                <tr>
-                    <td>
-                        Mg<sup>2+</sup>
-                    </td>
-                    <td>
-                        <input name="Mg" type="number" value="1.5"> mM
-                    </td>
-                </tr>
+</body>
 
-                <tr>
-                    <td>
-                        Mon<sup>2+</sup>
-                    </td>
-                    <td>
-                        <input name="Mon" type="number" value="5"> mM
-                    </td>
-                </tr>
+<script>
 
-                <tr>
-                    <td>
-                        dNTPs<sup>2+</sup>
-                    </td>
-                    <td>
-                        <input name="dNTPs" type="number"> mM
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        Tris<sup>2+</sup>
-                    </td>
-                    <td>
-                        <input name="dNTPs" type="number" value="10"> mM
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        t<sup>2+</sup>
-                    </td>
-                    <td>
-                        <input name="dNTPs" type="number" value="0.002"> mM
-                    </td>
-                </tr>
-
-            </table>
-            <br>
-
-            <div>
-                gene<br>
-                <label>
-                    {#            TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA#}
-                    <textarea name="gene_input" cols="110" rows="10" id="gene">TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTTATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGGTGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCGCGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCGCGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGGCTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGGGCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGCGCTCACTGGCCGTCGTTTTACAACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGCCTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCGAAGAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGCAGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATA</textarea>
-                </label>
-            </div>
-            <br>
-
-            <button type="submit">submit</button>
-
-        </form>
-
-
-    </body>
+</script>
 </html>

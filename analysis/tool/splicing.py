@@ -1,6 +1,7 @@
 import math
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 def show_w(x, y, head):
@@ -8,14 +9,14 @@ def show_w(x, y, head):
     tem_str = "min:{:3f},max:{:3f},max-min={:3f},std={:4f}".format(min(y), max(y), max(y) - min(y), np.std(y))
     plt.legend([tem_str])
     plt.title(head)
-    # plt.ylim(80, 90)
     plt.show()
+
 
 class Splicing:
     def __init__(self, gene, input_info):
         self.gene = gene
-        self.min_len = 15
-        self.max_len = 35
+        self.min_len = 20
+        self.max_len = 30
         self.count = 20
         self.input_info = input_info  # 各种离子信息
 
@@ -54,27 +55,24 @@ class Splicing:
             -21.0) + GACT * (
                 -22.2) + CGGC * (-27.2) + GCCG * (-24.4) + GGCC * (-19.9) - 5.7 + 6.9 - 1.4
 
-        #  钠离子浓度需要重新设置
-        # 当Na+ 浓度不是1 mol / L 时，就需要对其校正，并且C_t / 4
-        # c_Mon = 0.005  # 输入浓度
-        # c_Mg = 1.5e-3  #
-        # c_K = 5.0e-2  # mol / L
-        # c_Tris = 1.0e-2  # mol / L#
-        # c_Na = 1e3  #
-        # c_t = 2e-3  # mmol / L#
+        # TODO 钠离子浓度是多少？
 
-        c_Mon = self.input_info['Mon']  # 输入浓度
-        c_Mg = self.input_info['Mg']  #
-        c_K = self.input_info['K']  # mol / L
-        c_Tris = self.input_info['Tris']  # mol / L#
-        c_Na = self.input_info['Na']  #
-        c_t = self.input_info['t']  # mmol / L#
+        c_Na = 1.3 # mmol /
 
-        c_dNTP = 8.0e-4  # 脱氧核糖核苷三磷酸
-        # c_Mg = c_Mg - c_dNTP
+        c_K = self.input_info['K'] / 1000 #
+        c_Mg = self.input_info['Mg'] / 1000 #
+        c_dNTPs = self.input_info['dNTPs'] / 1000
+        c_Tris = self.input_info['Tris'] / 1000   # mol / L#
 
-        c_primer = 0  # 引物
-        c_oligo = 0  # 寡核苷酸
+        c_oligo = self.input_info['oligo'] / 1e9  # 寡核苷酸
+        c_t = self.input_info['primer'] / 1e9 # 引物
+
+        # TODO 当premer不是远大于oligo时，c_t需要重新计算
+
+        # TODO Mon离子浓度初始化
+        # c_Mon = 0.005
+        c_Mon = c_K + c_Tris # + c_Na
+        c_Mg = c_Mg - c_dNTPs
 
         kelvins = 273.15
 
@@ -86,10 +84,10 @@ class Splicing:
         f = 5.25e-4
         g = 8.31e-5
 
-        f_GC = (temp_gene.count("C") + temp_gene.count("G")) / len(temp_gene)  # 计算一小片段中gc的含量
         n_bp = len(temp_gene)
+        f_GC = (temp_gene.count("C") + temp_gene.count("G")) / n_bp  # 计算一小片段中gc的含量
 
-        tm = (H * 1000) / (S + 1.987 * math.log((c_t / 1000) / 4)) + 16.6 * math.log(1.02)
+        tm = (H * 1000) / (S + 1.987 * math.log((c_t / 1000) / 4)) + 16.6 * math.log(c_Na)
 
         if c_Mon == 0:
             tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
@@ -99,11 +97,11 @@ class Splicing:
             R = math.sqrt(c_Mg) / c_Mon
 
             if R < 0.22:
-                c_Mon = c_Na + c_K + c_Tris
+                c_Mon = c_K + c_Tris + c_Na
                 tem = 1 / tm + (4.29 * f_GC - 3.95) * 10e-5 * math.log(c_Mon) + 9.4e-6 * (math.log(c_Mon)) ** 2
                 return 1 / tem - kelvins
-            elif R < 6.0:
 
+            elif R < 6.0:
                 a = 3.92e-5 * (0.843 - 0.352 * math.sqrt(c_Mon) * math.log(c_Mon))
                 d = 1.42e-5 * (1.279 - 4.03e-3 * math.log(c_Mon) - 8.03e-3 * (math.log(c_Mon)) ** 2)
                 g = 8.31e-5 * (0.486 - 0.258 * math.log(c_Mon) + 5.25e-3 * (math.log(c_Mon)) ** 3)
@@ -111,11 +109,10 @@ class Splicing:
                 tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
                         e + f * math.log(c_Mg) + g * (math.log(c_Mg) ** 2)) / (2 * (n_bp - 1))
                 return 1 / tem - kelvins
-            else:
 
+            else:
                 tem = 1 / tm + a + b * math.log(c_Mg) + f_GC * (c + d * math.log(c_Mg)) + (
                         e + f * math.log(c_Mg) + g * (math.log(c_Mg) ** 2)) / (2 * (n_bp - 1))
-
                 return 1 / tem - kelvins
 
     def cal_first_tm(self, mean_tm=0.):
@@ -172,6 +169,10 @@ class Splicing:
             tem_res = []
             for i in range(len(result)):  # 遍历上一轮选择到的最优的
                 fir_cut = int(result[i, -2])  # 这段gene开始
+                # TODO 如果这个长度小鱼最小切割位点，退出（推出前应该如何）
+                if fir_cut + self.min_len > len(self.gene):
+                    fir_ans_tem = result
+                    break
                 for j in range(self.max_len - self.min_len):  #
                     sec_cut = fir_cut + self.min_len + j  # 这段gene结束
                     if sec_cut > len(self.gene) - 1:
@@ -206,7 +207,7 @@ class Splicing:
         index_res = np.array(fir_ans_tem[0][:-1:2])
         tm_res = np.array(fir_ans_tem[0][1::2])
 
-        show_w(index_res, tm_res, "greedy")
+        # show_w(index_res, tm_res, "greedy")
         return index_res, tm_res
 
     def cal_all_tm(self, arr):
@@ -361,7 +362,14 @@ class Splicing:
             gene_list[a[i]][2] = test_result[0, 1]
             gene_list[a[i]][4] = test_result[0, 2]
             tm_list[a[i]] = test_result[0, 2]
+
         show_w(index_list[1:], tm_list, "end")
+        print("overlap_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(tm_list),
+                                                                                           max(tm_list),
+                                                                                           np.std(tm_list),
+                                                                                           max(tm_list) - min(
+                                                                                               tm_list),
+                                                                                           np.mean(tm_list)))
 
         # for i in range(len(gene_list)):
         #     print("原来+{0}，更改{1}".format(gene_list[i][3] - gene_list[i][0], gene_list[i][2] - gene_list[i][1]))
@@ -405,7 +413,7 @@ class Splicing:
             if i + 1 < len(index_list):
                 coun += 1
                 gene_tem = gene_complement[int(index_list[i][1]):int(index_list[i + 1][2])]
-                res_index2.append(gene_tem[::-1])
+                res_index2.append(gene_tem[::-1])  # 转化成5'到3'
 
         if len(index_list) % 2 == 0:  # 最后一片
             coun += 1
@@ -414,17 +422,64 @@ class Splicing:
         # print(coun)
         return res_index1, res_index2
 
+    def get_more_info(self, list_g1, list_g2, cut_of_index):
+
+        len_g1 = len(list_g1)
+        info = []  #
+        for i, tem_gene in enumerate(list_g1):  # TODO 全部更换成这样
+            ind = 'F{0}'.format(i + 1)
+            if i*2+1 >= len(cut_of_index):
+                overlap = np.nan
+            else:
+                overlap = int(cut_of_index[i * 2 + 1][2] - cut_of_index[i * 2 + 1][1])
+            # index， gene， len_gene， gene_tm， overlap
+            info.append([ind, tem_gene, len(tem_gene), round(self.cal_tm(tem_gene), 2), overlap])
+
+        for i, tem_gene in enumerate(list_g2):
+            ind = 'R{0}'.format(len_g1 + i + 1)
+            if i*2 >= len(cut_of_index) or i == 0:
+                overlap = np.nan
+            else:
+                overlap = int(cut_of_index[i*2][2] - cut_of_index[i*2][1])
+            info.append([ind, tem_gene, len(tem_gene), round(self.cal_tm(tem_gene), 2), overlap])  # , Splicing.cal_tm(tem_gene)
+
+        count_cut  = len(cut_of_index)
+        out = []
+        if count_cut%2 == 0:
+            out = [count_cut/2, count_cut]
+        else:
+            out = [int(math.floor(count_cut / 2)), int(math.floor(count_cut / 2)) + 1]
+
+        data = []
+        for i, ele in enumerate(info):
+            if i not in out:
+                data.append(ele[3])
+
+        x = [i for i in range(len(data))]
+        show_w(x, data, "Splicing")
+
+        print(max(data),min(data), np.std(data))
+        print("gene_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(data),
+                                                                                          max(data),
+                                                                                          np.std(data),
+                                                                                          max(data) - min(
+                                                                                              data),
+                                                                                          np.mean(data)))
+
+        return info
+
     def cal(self):
         index, tm = self.cal_next_tm()
         # show_w(index, tm, "f")
         # 初步贪心得到的结果，将tm取均值，然后当做起点
         index, tm = self.cal_next_tm(float(np.mean(tm)))
+        show_w(index, tm, "init")
         # 对整体遍历
         index = np.insert(index, 0, [0])
-
         index, tm = self.iteration(index, tm)
         cut_of_index = self.overlap(index, tm)
         res1, res2 = self.get_gene_list(cut_of_index)
         print("拼接前基因片段个数:{0}".format(len(cut_of_index)))
 
-        return res1, res2, len(cut_of_index)
+        info = self.get_more_info(res1, res2, cut_of_index)
+        return res1, res2, len(cut_of_index), info
