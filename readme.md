@@ -1,9 +1,11 @@
 readme
 a project for cutting dna
 
-test
+### 完善后端处理工作
 
-测试一下
+### 完善前段输出信息
+
+
 
 ## 检验
 1. 将结果全都放在一起测试

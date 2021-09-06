@@ -28,10 +28,14 @@ class HomeView(View):
 
     def post(self, request):
         data = request.POST
-        gene = data.get('gene_input')
-        # gene = gene[: 440]
+        # gene = data.get('gene_input')
+        # print(data.get('res_type'))
         input_info = {
+            'gene': data.get('gene_input'),  # 输入基因序列
+            'res_type': data.get('res_type'),  # 结果：gepless?gap
 
+            # 各种离子浓度
+            'Na': float(data.get('Na')),
             'K': float(data.get('K')),
             'Mg': float(data.get('Mg')),
             'dNTPs': float(data.get('dNTPs')),
@@ -39,23 +43,23 @@ class HomeView(View):
             'oligo': float(data.get('oligo')),
             'primer': float(data.get('primer')),
         }
-        print(len(gene))
-        print(input_info)
 
-        splic = Splicing(gene, input_info)
+        # print(len(gene))
+        # print(input_info)
+
+        splic = Splicing(input_info)
         list_g1, list_g2, len1, info = splic.cal()
 
+        # 分析过程
         # analy = Analysis(list_g1, list_g2, len1)
         # info = analy.get_more_info()
         # analy.analysis_two()
         # analy.analysis_three()
 
-
         context = {
-            'gene_len': len(gene),  # 输入的序列长度
-            'gene': gene,  # 输入的序列
+            'gene_len': len(input_info['gene']),  # 输入的序列长度
+            'gene': input_info['gene'],  # 输入的序列
             'info': info,
-
         }
 
         return render(request, 'result.html', context)

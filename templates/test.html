@@ -79,6 +79,15 @@
 
             <tr>
                 <td>
+                    Na<sup>+</sup>(0.5-1.5M)
+                </td>
+                <td>
+                    <input class="input" name="Na" type="number" step="0.1" value="1.1"> M
+                </td>
+            </tr>
+
+            <tr>
+                <td>
                     Na<sup>+</sup> /K<sup>+</sup>(1-1000mM)
                 </td>
                 <td>
@@ -140,13 +149,21 @@
 
         </table>
         <br>
-
     </div>
+
+    <h3>result type</h3>
+    <div class="result">
+        <input name="res_type" type="radio" value="gapless" checked>gapless
+        <input name="res_type" type="radio" value="gap">gap
+    </div>
+
     <h3>Is the gene is too long </h3>
     <div class="mydiv">
         <input name="choose" onclick="ch('no')" type="radio" value="no" checked>no
         <input name="choose" onclick="ch('yes')" type="radio" value="yes">yes
     </div>
+
+
     <div id="0" class="mydiv" style="display: none">
         How many parts does it need to be divided into?<br>
         <div class="mydiv">
@@ -169,7 +186,6 @@
     <br>
 
     <div class="mydiv">
-
         <button type="submit">submit</button>
     </div>
 
