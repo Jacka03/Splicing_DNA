@@ -44,9 +44,6 @@ class HomeView(View):
             'primer': float(data.get('primer')),
         }
 
-        # print(len(gene))
-        # print(input_info)
-
         splic = Splicing(input_info)
         list_g1, list_g2, len1, info = splic.cal()
 
@@ -59,7 +56,13 @@ class HomeView(View):
         context = {
             'gene_len': len(input_info['gene']),  # 输入的序列长度
             'gene': input_info['gene'],  # 输入的序列
-            'info': info,
+            'info': info.get('result'),
+            'min': info.get('min'),
+            'max': info.get('max'),
+            'range': info.get('range'),
+            'mean': info.get('mean'),
+            'std': info.get('std'),
+            'result_type': data.get('res_type')  # 结果：gepless?gap
         }
 
         return render(request, 'result.html', context)

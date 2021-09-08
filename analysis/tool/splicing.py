@@ -368,127 +368,91 @@ class Splicing:
             tm_list[a[i]] = test_result[0, 2]
 
         show_w(index_list[1:], tm_list, "end")
-        print("overlap_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(tm_list),
-                                                                                           max(tm_list),
-                                                                                           np.std(tm_list),
-                                                                                           max(tm_list) - min(
-                                                                                               tm_list),
-                                                                                           np.mean(tm_list)))
+        # 这里包含了第一片和最后一片
+        # print("overlap_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(tm_list),
+        #                                                                                    max(tm_list),
+        #                                                                                    np.std(tm_list),
+        #                                                                                    max(tm_list) - min(
+        #                                                                                        tm_list),
+        #                                                                                    np.mean(tm_list)))
 
         # for i in range(len(gene_list)):
         #     print("原来+{0}，更改{1}".format(gene_list[i][3] - gene_list[i][0], gene_list[i][2] - gene_list[i][1]))
-        print("每个间隙的长度:", end=" ")
+        # print("每个间隙的长度:", end=" ")
         for i in range(len(gene_list) - 1):
             print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
-        print()
+        # print()
         return gene_list
 
     def get_gene_list(self, index_list):
-        # 将每个片段返回
-        res_index1 = []
-        res_index2 = []
-
+        # 将两个overlap拼接成一个Oligo
         dnaTable = {
             "A": "T", "T": "A", "C": "G", "G": "C"
         }
-
-        gene_complement = ""
+        gene_complement = ""  # DNA互补链
         for ele in self.gene:
             gene_complement += dnaTable[ele]
 
-        # print(gene)
-        # print(gene_complement)
-        coun = 0
+        res_index1 = []  # 存储DNA双链上面的oligo
         for i in range(0, len(index_list), 2):
             if i + 1 < len(index_list):
-                coun += 1
                 res_index1.append(self.gene[int(index_list[i][1]): int(index_list[i + 1][2])])
-
         if len(index_list) % 2 != 0:  # 最后一片
-            coun += 1
             res_index1.append(self.gene[int(index_list[-1][1]): int(index_list[-1][2])])
 
+        res_index2 = []  # 存储DNA双链下面的oligo
         # 第一片
         gene_tem = gene_complement[int(index_list[0][1]):int(index_list[0][2])]  # TODO 第一篇出问题了
-        # print(gene_tem[::-1])
         res_index2.append(gene_tem[::-1])
-
         for i in range(1, len(index_list), 2):
             if i + 1 < len(index_list):
-                coun += 1
                 gene_tem = gene_complement[int(index_list[i][1]):int(index_list[i + 1][2])]
                 res_index2.append(gene_tem[::-1])  # 转化成5'到3'
-
         if len(index_list) % 2 == 0:  # 最后一片
-            coun += 1
             gene_tem = gene_complement[int(index_list[-1][1]):int(index_list[-1][2])]
             res_index2.append(gene_tem[::-1])
-        # print(coun)
+
         return res_index1, res_index2
 
     def get_more_info(self, list_g1, list_g2, cut_of_index):
         # 获取返回前端的信息
-        info = []  #
-        for i, tem_gene in enumerate(list_g1):  # TODO 全部更换成这样
+        info = []  # 存放oligo信息[index, oligo, len, overlap, tm]
+        for i, tem_gene in enumerate(list_g1):  # 先计算上面的单链
             ind = 'F{0}'.format(i)
             if i*2+1 >= len(cut_of_index):
-                overlap = np.nan
-                tem_tm = np.nan
+                overlap = -1
+                tem_tm = -1
             else:
                 overlap = int(cut_of_index[i * 2 + 1][2] - cut_of_index[i * 2 + 1][1])
                 tem_tm = round(self.cal_tm(tem_gene[-overlap:]), 2)
             # index， gene， len_gene， gene_tm， overlap
-            info.append([ind, tem_gene, len(tem_gene), tem_tm, overlap, round(self.cal_tm(tem_gene), 2)])
+            info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])
 
-        for i, tem_gene in enumerate(list_g2):
+        for i, tem_gene in enumerate(list_g2):  # 计算下面的单链
             ind = 'R{0}'.format(i)
             if i*2 >= len(cut_of_index) or i == 0:
-                overlap = np.nan
-                tem_tm = np.nan
+                overlap = -1
+                tem_tm = -1
             else:
                 overlap = int(cut_of_index[i*2][2] - cut_of_index[i*2][1])
                 tem_tm = round(self.cal_tm(tem_gene[:overlap]), 2)
-            info.append([ind, tem_gene, len(tem_gene), tem_tm, overlap, round(self.cal_tm(tem_gene), 2)])  # , Splicing.cal_tm(tem_gene)
+            info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
 
-        count_cut  = len(cut_of_index)
-        out = []
-        if count_cut%2 == 0:
+        count_cut = len(cut_of_index)
+        # out = []  # 这两条连的是不需要计算tm的
+        if count_cut % 2 == 0:
             out = [count_cut/2, count_cut]
         else:
             out = [int(math.floor(count_cut / 2)), int(math.floor(count_cut / 2)) + 1]
 
         data = []  # 记录overlap片段的tm
-        data1 = []  # 记录整个片段的tm
         for i, ele in enumerate(info):
             if i not in out:
-                data.append(ele[3])
-                data1.append(ele[5])
+                data.append(ele[2])
 
         x = [i for i in range(len(data))]
         show_w(x, data, "Splicing")
 
-        # overlap的信息
-        overlap_data = {
-            'min': min(data),
-            'max': max(data),
-            'range': max(data) - min(data),
-            'mean': np.mean(data),
-            'std': np.std(data)
-        }
-
-        print("overlap_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(data),
-                                                                                          max(data),
-                                                                                          np.std(data),
-                                                                                          max(data) - min(
-                                                                                              data),
-                                                                                          np.mean(data)))
-
-        # print("gene_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(data1),
-        #                                                                                           max(data1),
-        #                                                                                           np.std(data1),
-        #                                                                                           max(data1) - min(
-        #                                                                                               data1),
-        #                                                                                           np.mean(data1)))
         len_g1 = len(list_g1)
         len_g2 = len(list_g2)
         len_info = len(info)
@@ -501,16 +465,31 @@ class Splicing:
                 tem[0] = "R{0}".format(i)
                 result.append(tem)
 
-        len1 = info[0][2] - info[0][4]
-        result.append(["F_Primer", info[0][1][:len1], len1, np.nan, np.nan])
+        # [ind, tem_gene, tem_tm, overlap, len(tem_gene)]
+        # 第一段 可以写死
+        len1 = info[0][4] - info[0][3]
+        f_gene = info[0][1][:len1]
+        result.append(["F_Primer", f_gene, round(self.cal_tm(f_gene), 2), -1, len1])
 
         # len1 = info[-1][2] - info[-1][4]
-        result.append(["R_Primer", info[-1][1], len1, np.nan, np.nan])
+        if len_g1 != len_g2:
+            result.append(["R_Primer", info[-1][1], round(self.cal_tm(info[-1][1]), 2), -1, len(info[-1][1])])
+        else:
+            len1 = info[-1][3]
+            f_gene = info[-1][1]
+            result.append(["R_Primer", f_gene[:len1], round(self.cal_tm(f_gene[:len1]), 2), -1, info[-1][3]])
 
-        # len1 = info[-1]
-        # len1[0] = "R_Primer"
-        # result.append(len1)
-        return result
+        # overlap的信息
+        overlap_data = {
+            'min': min(data),
+            'max': max(data),
+            'range': round(max(data) - min(data), 2),
+            'mean': round(np.mean(data), 2),
+            'std': round(np.std(data), 2),
+            'result': result
+        }
+
+        return overlap_data
 
     def cal_mean_std(self, index):
         # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
@@ -531,10 +510,10 @@ class Splicing:
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
-        if self.res_type == 'gepless':
+        if self.res_type == 'gapless':
             cut_of_index1 = self.cal_mean_std(index)
             res11, res21 = self.get_gene_list(cut_of_index1)
-            print("拼接前基因片段个数:{0}".format(len(cut_of_index1)))
+            # print("拼接前基因片段个数:{0}".format(len(cut_of_index1)))
             info1 = self.get_more_info(res11, res21, cut_of_index1)
             return res11, res21, len(cut_of_index1), info1
         else:

@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>result</title>
-    </head>
-
     <body>
 
         gene<br>
@@ -18,9 +13,9 @@
             <tr>
                 <th>lable</th>
                 <th>Oligonucleotide sequence (5’ to 3’)</th>
-                <th>len</th>
                 <th>Tm</th>
                 <th>overlap</th>
+                <th>length</th>
             </tr>
 
             {% for i in info %}
@@ -32,10 +27,10 @@
                         {{ i[1] }}
                     </td>
                     <td>
-                        {{ i[2] }}
+                        {% if i[2] != -1 %} {{ i[2] }} {% endif %}
                     </td>
                     <td>
-                        {{ i[3] }}
+                        {% if i[3] != -1 %} {{ i[3] }} {% endif %}
                     </td>
                     <td>
                         {{ i[4] }}
@@ -44,11 +39,37 @@
             {% endfor %}
         </table>
         <br>
+        result type: {{ result_type }}
+        <br>
+        <table border="1" cellspacing="0">
+            <tr>
+                <td>min</td>
+                <td>{{ min }}</td>
+            </tr>
 
-    min:{{ min }}<br>
-    max:{{ max }}<br>
-    std:{{ std }}<br>
+            <tr>
+                <td>max</td>
+                <td>{{ max }}</td>
+            </tr>
+            <tr>
+                <td>range</td>
+                <td>{{ range }}</td>
+            </tr>
+            <tr>
+                <td>mean</td>
+                <td>{{ mean }}</td>
+            </tr>
+            <tr>
+                <td>std</td>
+                <td>{{ std }}</td>
+            </tr>
+        </table>
 
 
     </body>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>result</title>
+    </head>
 </html>

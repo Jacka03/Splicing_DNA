@@ -22,7 +22,6 @@ class Analysis:
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = 37  # 验证 时的温度
 
-
     # def get_more_info(self):
     #     info = []  #
     #     for i, tem_gene in enumerate(self.list_g1):  # TODO 全部更换成这样
@@ -234,3 +233,8 @@ class Analysis:
         t1 = Tube(strands=strands, complexes=SetSpec(max_size=count), name='t1')  # complexes defaults to [A, B]
         tube_results = tube_analysis(tubes=[t1], model=my_model)
         print(tube_results)
+
+    def analysis_primer(self, primer, list):
+
+
+        pass
