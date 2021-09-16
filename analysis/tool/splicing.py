@@ -500,21 +500,21 @@ class Splicing:
         # print(tem_res)
         return tem_res
 
-    def return_result(self, index, tm):
-
-        cut_of_index1 = self.cal_mean_std(index)
-        res11, res21 = self.get_gene_list(cut_of_index1)
-        info1 = self.get_more_info(res11, res21, cut_of_index1)
-        # return res11, res21, len(cut_of_index1), info1
-
-        cut_of_index = self.overlap(index, tm)
-        res1, res2 = self.get_gene_list(cut_of_index)
-        info = self.get_more_info(res1, res2, cut_of_index)
-        # return res1, res2, len(cut_of_index), info
-
-        res = {'gapless': [res11, res21, len(cut_of_index1), info1], 'gap': [res1, res2, len(cut_of_index), info]}
-
-        return res
+    # def return_result(self, index, tm):
+    #
+    #     cut_of_index1 = self.cal_mean_std(index)
+    #     res11, res21 = self.get_gene_list(cut_of_index1)
+    #     info1 = self.get_more_info(res11, res21, cut_of_index1)
+    #     # return res11, res21, len(cut_of_index1), info1
+    #
+    #     cut_of_index = self.overlap(index, tm)
+    #     res1, res2 = self.get_gene_list(cut_of_index)
+    #     info = self.get_more_info(res1, res2, cut_of_index)
+    #     # return res1, res2, len(cut_of_index), info
+    #
+    #     res = {'gapless': [res11, res21, len(cut_of_index1), info1], 'gap': [res1, res2, len(cut_of_index), info]}
+    #
+    #     return res
 
     def cal(self):
         index, tm = self.cal_next_tm()
@@ -526,15 +526,15 @@ class Splicing:
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
-        return self.return_result(index, tm)
+        # return self.return_result(index, tm)
 
-        # if self.res_type == 'gapless':
-        #     cut_of_index1 = self.cal_mean_std(index)
-        #     res11, res21 = self.get_gene_list(cut_of_index1)
-        #     info1 = self.get_more_info(res11, res21, cut_of_index1)
-        #     return res11, res21, len(cut_of_index1), info1
-        # else:
-        #     cut_of_index = self.overlap(index, tm)
-        #     res1, res2 = self.get_gene_list(cut_of_index)
-        #     info = self.get_more_info(res1, res2, cut_of_index)
-        #     return res1, res2, len(cut_of_index), info
+        if self.res_type == 'gapless':
+            cut_of_index1 = self.cal_mean_std(index)
+            res11, res21 = self.get_gene_list(cut_of_index1)
+            info1 = self.get_more_info(res11, res21, cut_of_index1)
+            return res11, res21, len(cut_of_index1), info1
+        else:
+            cut_of_index = self.overlap(index, tm)
+            res1, res2 = self.get_gene_list(cut_of_index)
+            info = self.get_more_info(res1, res2, cut_of_index)
+            return res1, res2, len(cut_of_index), info
