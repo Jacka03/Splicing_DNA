@@ -1,75 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-    <body>
-
-        gene<br>
-        <label>
-            <textarea cols="110" rows="10">{{ gene }}</textarea>
-        </label><br>
-        length:<label>{{ gene_len }}</label><br>
-        <hr>
-
-        <table border="1" cellspacing="0">
-            <tr>
-                <th>lable</th>
-                <th>Oligonucleotide sequence (5’ to 3’)</th>
-                <th>Tm</th>
-                <th>overlap</th>
-                <th>length</th>
-            </tr>
-
-            {% for i in info %}
-                <tr>
-                    <td>
-                        {{ i[0] }}
-                    </td>
-                    <td>
-                        {{ i[1] }}
-                    </td>
-                    <td>
-                        {% if i[2] != -1 %} {{ i[2] }} {% endif %}
-                    </td>
-                    <td>
-                        {% if i[3] != -1 %} {{ i[3] }} {% endif %}
-                    </td>
-                    <td>
-                        {{ i[4] }}
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-        <br>
-        result type: {{ result_type }}
-        <br>
-        <table border="1" cellspacing="0">
-            <tr>
-                <td>min</td>
-                <td>{{ min }}</td>
-            </tr>
-
-            <tr>
-                <td>max</td>
-                <td>{{ max }}</td>
-            </tr>
-            <tr>
-                <td>range</td>
-                <td>{{ range }}</td>
-            </tr>
-            <tr>
-                <td>mean</td>
-                <td>{{ mean }}</td>
-            </tr>
-            <tr>
-                <td>std</td>
-                <td>{{ std }}</td>
-            </tr>
-        </table>
+<head>
+    <script>
 
 
-    </body>
+        function getResultType(flag) {
+            var table = document.getElementById()
+            if(flag == 'gap') {
 
-    <head>
-        <meta charset="UTF-8">
-        <title>result</title>
-    </head>
+            } else {
+
+            }
+
+        }
+
+
+
+    </script>
+</head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<body>
+
+gene<br>
+<label>
+    <textarea cols="110" rows="10">{{ gene }}</textarea>
+</label><br>
+length:<label>{{ gene_len }}</label><br>
+<br>
+result type:
+<input type="radio" name="result_type" onclick="getResultType(this.value)" value="gap" checked/>gap
+<input type="radio" name="result_type" onclick="getResultType(this.value)" value="gapless"/>gapless
+<br>
+<hr>
+
+<table border="1" cellspacing="0">
+    <tr>
+        <th>lable</th>
+        <th>Oligonucleotide sequence (5’ to 3’)</th>
+        <th>Tm</th>
+        <th>overlap</th>
+        <th>length</th>
+    </tr>
+
+    {% for i in info %}
+        <tr>
+            <td>
+                {{ i[0] }}
+            </td>
+            <td>
+                {{ i[1] }}
+            </td>
+            <td>
+                {% if i[2] != -1 %} {{ i[2] }} {% endif %}
+            </td>
+            <td>
+                {% if i[3] != -1 %} {{ i[3] }} {% endif %}
+            </td>
+            <td>
+                {{ i[4] }}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+<a href="/export_excel">
+    <button type="button" class="btnStyle">download</button>
+</a>
+
+<br>
+<br>
+
+<table border="1" cellspacing="0">
+    <tr>
+        <td>min</td>
+        <td>{{ min }}</td>
+    </tr>
+
+    <tr>
+        <td>max</td>
+        <td>{{ max }}</td>
+    </tr>
+    <tr>
+        <td>range</td>
+        <td>{{ range }}</td>
+    </tr>
+    <tr>
+        <td>mean</td>
+        <td>{{ mean }}</td>
+    </tr>
+    <tr>
+        <td>std</td>
+        <td>{{ std }}</td>
+    </tr>
+</table>
+
+
+</body>
+
+<head>
+    <meta charset="UTF-8">
+    <title>result</title>
+</head>
 </html>

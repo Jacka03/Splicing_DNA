@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+{#    <meta charset="UTF-8">#}
     <title>Splicing_DNA</title>
 
     <style type="text/css">
@@ -159,16 +160,16 @@
 
     <h3>Is the gene is too long </h3>
     <div class="mydiv">
-        <input name="choose" onclick="ch('no')" type="radio" value="no" checked>no
-        <input name="choose" onclick="ch('yes')" type="radio" value="yes">yes
+        <input name="choose" onclick="ch(this.value)" type="radio" value="no" checked>no
+        <input name="choose" onclick="ch(this.value)" type="radio" value="yes">yes
     </div>
 
 
     <div id="0" class="mydiv" style="display: none">
         How many parts does it need to be divided into?<br>
         <div class="mydiv">
-            <input name="choose1" onclick="ch1('no')" type="radio" value="no" checked>default
-            <input name="choose1" onclick="ch1('yes')" type="radio" value="yes">custom
+            <input name="choose1" onclick="ch1(this.value)" type="radio" value="no" checked>default
+            <input name="choose1" onclick="ch1(this.value)" type="radio" value="yes">custom
         </div>
 
         <div id="1" style="display: none">

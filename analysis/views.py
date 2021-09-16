@@ -11,14 +11,20 @@ from analysis.tool.analysis import Analysis
 from analysis.tool.splicing import Splicing
 
 
-class AnalysisView(View):
-
+class DownloadView(View):     # 导出excel数据
     def get(self, request):
-        # return HttpResponse("get")
-        return render(request, 'result.html')
+        print("test success")
+        return HttpResponse("get")
 
-    def post(self, request):
-        return HttpResponse('post')
+
+# class AnalysisView(View):
+#
+#     def get(self, request):
+#         # return HttpResponse("get")
+#         return render(request, 'result.html')
+#
+#     def post(self, request):
+#         return HttpResponse('post')
 
 
 class HomeView(View):
@@ -30,8 +36,9 @@ class HomeView(View):
         data = request.POST
         # gene = data.get('gene_input')
         # print(data.get('res_type'))
+        tem_gene = data.get('gene_input').replace('\n', '').replace(' ', '').replace('\r', '')
         input_info = {
-            'gene': data.get('gene_input'),  # 输入基因序列
+            'gene': tem_gene,  # 输入基因序列
             'res_type': data.get('res_type'),  # 结果：gepless?gap
 
             # 各种离子浓度
@@ -66,3 +73,4 @@ class HomeView(View):
         }
 
         return render(request, 'result.html', context)
+

@@ -62,20 +62,20 @@ class Splicing:
 
         # c_Na = 1.3 # mmol /
 
-        c_Na = self.input_info['Na']#
-        c_K = self.input_info['K'] / 1000 #
-        c_Mg = self.input_info['Mg'] / 1000 #
+        c_Na = self.input_info['Na']  #
+        c_K = self.input_info['K'] / 1000  #
+        c_Mg = self.input_info['Mg'] / 1000  #
         c_dNTPs = self.input_info['dNTPs'] / 1000
-        c_Tris = self.input_info['Tris'] / 1000   # mol / L#
+        c_Tris = self.input_info['Tris'] / 1000  # mol / L#
 
         c_oligo = self.input_info['oligo'] / 1e9  # 寡核苷酸
-        c_t = self.input_info['primer'] / 1e9 # 引物
+        c_t = self.input_info['primer'] / 1e9  # 引物
 
         # TODO 当premer不是远大于oligo时，c_t需要重新计算
 
         # TODO Mon离子浓度初始化
         # c_Mon = 0.005
-        c_Mon = c_K + c_Tris # + c_Na
+        c_Mon = c_K + c_Tris  # + c_Na
         c_Mg = c_Mg - c_dNTPs
 
         kelvins = 273.15
@@ -419,7 +419,7 @@ class Splicing:
         info = []  # 存放oligo信息[index, oligo, len, overlap, tm]
         for i, tem_gene in enumerate(list_g1):  # 先计算上面的单链
             ind = 'F{0}'.format(i)
-            if i*2+1 >= len(cut_of_index):
+            if i * 2 + 1 >= len(cut_of_index):
                 overlap = -1
                 tem_tm = -1
             else:
@@ -430,18 +430,18 @@ class Splicing:
 
         for i, tem_gene in enumerate(list_g2):  # 计算下面的单链
             ind = 'R{0}'.format(i)
-            if i*2 >= len(cut_of_index) or i == 0:
+            if i * 2 >= len(cut_of_index) or i == 0:
                 overlap = -1
                 tem_tm = -1
             else:
-                overlap = int(cut_of_index[i*2][2] - cut_of_index[i*2][1])
+                overlap = int(cut_of_index[i * 2][2] - cut_of_index[i * 2][1])
                 tem_tm = round(self.cal_tm(tem_gene[:overlap]), 2)
             info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
 
         count_cut = len(cut_of_index)
         # out = []  # 这两条连的是不需要计算tm的
         if count_cut % 2 == 0:
-            out = [count_cut/2, count_cut]
+            out = [count_cut / 2, count_cut]
         else:
             out = [int(math.floor(count_cut / 2)), int(math.floor(count_cut / 2)) + 1]
 
@@ -460,8 +460,8 @@ class Splicing:
         for i in range(max(len_g1, len_g2)):
             if i < len_g1:
                 result.append(info[i])
-            if len_g1+i+1 < len_info:
-                tem = info[len_g1+i+1]
+            if len_g1 + i + 1 < len_info:
+                tem = info[len_g1 + i + 1]
                 tem[0] = "R{0}".format(i)
                 result.append(tem)
 
@@ -495,10 +495,26 @@ class Splicing:
         # 根据一个切割位点list转化为[[i1, i1, i2, i2, tm], ...]的形式, 方便后面计算这种切割的overlap的tm
         tem_res = []
         for i in range(1, len(index)):
-            tem_gene = self.gene[int(index[i-1]):int(index[i])]
-            tem_res.append([int(index[i-1]), int(index[i-1]), int(index[i]), int(index[i]), self.cal_tm(tem_gene)])
+            tem_gene = self.gene[int(index[i - 1]):int(index[i])]
+            tem_res.append([int(index[i - 1]), int(index[i - 1]), int(index[i]), int(index[i]), self.cal_tm(tem_gene)])
         # print(tem_res)
         return tem_res
+
+    def return_result(self, index, tm):
+
+        cut_of_index1 = self.cal_mean_std(index)
+        res11, res21 = self.get_gene_list(cut_of_index1)
+        info1 = self.get_more_info(res11, res21, cut_of_index1)
+        # return res11, res21, len(cut_of_index1), info1
+
+        cut_of_index = self.overlap(index, tm)
+        res1, res2 = self.get_gene_list(cut_of_index)
+        info = self.get_more_info(res1, res2, cut_of_index)
+        # return res1, res2, len(cut_of_index), info
+
+        res = {'gapless': [res11, res21, len(cut_of_index1), info1], 'gap': [res1, res2, len(cut_of_index), info]}
+
+        return res
 
     def cal(self):
         index, tm = self.cal_next_tm()
@@ -510,16 +526,15 @@ class Splicing:
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
-        if self.res_type == 'gapless':
-            cut_of_index1 = self.cal_mean_std(index)
-            res11, res21 = self.get_gene_list(cut_of_index1)
-            # print("拼接前基因片段个数:{0}".format(len(cut_of_index1)))
-            info1 = self.get_more_info(res11, res21, cut_of_index1)
-            return res11, res21, len(cut_of_index1), info1
-        else:
-            cut_of_index = self.overlap(index, tm)
-            res1, res2 = self.get_gene_list(cut_of_index)
-            print("拼接前基因片段个数:{0}".format(len(cut_of_index)))
-            info = self.get_more_info(res1, res2, cut_of_index)
-            return res1, res2, len(cut_of_index), info
+        return self.return_result(index, tm)
 
+        # if self.res_type == 'gapless':
+        #     cut_of_index1 = self.cal_mean_std(index)
+        #     res11, res21 = self.get_gene_list(cut_of_index1)
+        #     info1 = self.get_more_info(res11, res21, cut_of_index1)
+        #     return res11, res21, len(cut_of_index1), info1
+        # else:
+        #     cut_of_index = self.overlap(index, tm)
+        #     res1, res2 = self.get_gene_list(cut_of_index)
+        #     info = self.get_more_info(res1, res2, cut_of_index)
+        #     return res1, res2, len(cut_of_index), info
