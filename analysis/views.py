@@ -34,13 +34,11 @@ class HomeView(View):
 
     def post(self, request):
         data = request.POST
-        # gene = data.get('gene_input')
-        # print(data.get('res_type'))
         tem_gene = data.get('gene_input').replace('\n', '').replace(' ', '').replace('\r', '')
         input_info = {
             'gene': tem_gene,  # 输入基因序列
             'res_type': data.get('res_type'),  # 结果：gepless?gap
-
+            'result':data.get('result'),
             # 各种离子浓度
             'Na': float(data.get('Na')),
             'K': float(data.get('K')),
@@ -52,25 +50,29 @@ class HomeView(View):
         }
 
         splic = Splicing(input_info)
-        list_g1, list_g2, len1, info = splic.cal()
-
-        # 分析过程
-        # analy = Analysis(list_g1, list_g2, len1)
-        # info = analy.get_more_info()
-        # analy.analysis_two()
-        # analy.analysis_three()
+        # list_g1, list_g2, len1, info = splic.cal()
+        next_cal, info = splic.cal()
 
         context = {
             'gene_len': len(input_info['gene']),  # 输入的序列长度
             'gene': input_info['gene'],  # 输入的序列
+            'res_type': input_info['res_type'],  # 输入的序列
             'info': info.get('result'),
             'min': info.get('min'),
             'max': info.get('max'),
             'range': info.get('range'),
             'mean': info.get('mean'),
-            'std': info.get('std'),
-            'result_type': data.get('res_type')  # 结果：gepless?gap
+            'std': info.get('std')
         }
+
+        if data.get('veri') == 'yes':
+            # 分析过程
+            analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
+            # info = analy.get_more_info()
+            analy_info_two = analy.analysis_two()
+            analy_info_three = analy.analysis_three()
+            context['analy_info_two'] = analy_info_two
+            context['analy_info_three'] = analy_info_three
 
         return render(request, 'result.html', context)
 

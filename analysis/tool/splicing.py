@@ -285,7 +285,7 @@ class Splicing:
             flag.append(best_std)
             # show_w(index_list[1:], tm_list, "d")
 
-        show_w(index_list[1:], tm_list, "iteration")
+        # show_w(index_list[1:], tm_list, "iteration")
 
         return index_list, tm_list
 
@@ -337,7 +337,7 @@ class Splicing:
             x = x + 1
             # show_w(index_list[1:], tm_list, x)
 
-        show_w(index_list[1:], tm_list, "overlap")
+        # show_w(index_list[1:], tm_list, "overlap")
 
         a = np.argsort(tm_list)
 
@@ -367,18 +367,8 @@ class Splicing:
             gene_list[a[i]][4] = test_result[0, 2]
             tm_list[a[i]] = test_result[0, 2]
 
-        show_w(index_list[1:], tm_list, "end")
-        # 这里包含了第一片和最后一片
-        # print("overlap_tm: min:{0}, max:{1}, Range:{3:.1f}, mean:{4:.1f}, std:{2:.4f}".format(min(tm_list),
-        #                                                                                    max(tm_list),
-        #                                                                                    np.std(tm_list),
-        #                                                                                    max(tm_list) - min(
-        #                                                                                        tm_list),
-        #                                                                                    np.mean(tm_list)))
+        # show_w(index_list[1:], tm_list, "end")
 
-        # for i in range(len(gene_list)):
-        #     print("原来+{0}，更改{1}".format(gene_list[i][3] - gene_list[i][0], gene_list[i][2] - gene_list[i][1]))
-        # print("每个间隙的长度:", end=" ")
         for i in range(len(gene_list) - 1):
             print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
         # print()
@@ -451,7 +441,7 @@ class Splicing:
                 data.append(ele[2])
 
         x = [i for i in range(len(data))]
-        show_w(x, data, "Splicing")
+        # show_w(x, data, "Splicing")
 
         len_g1 = len(list_g1)
         len_g2 = len(list_g2)
@@ -500,41 +490,31 @@ class Splicing:
         # print(tem_res)
         return tem_res
 
-    # def return_result(self, index, tm):
-    #
-    #     cut_of_index1 = self.cal_mean_std(index)
-    #     res11, res21 = self.get_gene_list(cut_of_index1)
-    #     info1 = self.get_more_info(res11, res21, cut_of_index1)
-    #     # return res11, res21, len(cut_of_index1), info1
-    #
-    #     cut_of_index = self.overlap(index, tm)
-    #     res1, res2 = self.get_gene_list(cut_of_index)
-    #     info = self.get_more_info(res1, res2, cut_of_index)
-    #     # return res1, res2, len(cut_of_index), info
-    #
-    #     res = {'gapless': [res11, res21, len(cut_of_index1), info1], 'gap': [res1, res2, len(cut_of_index), info]}
-    #
-    #     return res
+    def return_result(self, index, tm):
+        if self.res_type == 'gapless':
+            cut_of_ind = self.cal_mean_std(index)
+        elif self.res_type == 'gap':
+            cut_of_ind = self.overlap(index, tm)
+        return cut_of_ind
 
     def cal(self):
+
         index, tm = self.cal_next_tm()
         # show_w(index, tm, "f")
         # 初步贪心得到的结果，将tm取均值，然后当做起点
         index, tm = self.cal_next_tm(float(np.mean(tm)))
-        show_w(index, tm, "init")
+        # show_w(index, tm, "init")
         # 对整体遍历
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
-        # return self.return_result(index, tm)
+        cut_of_index = self.return_result(index, tm)
 
-        if self.res_type == 'gapless':
-            cut_of_index1 = self.cal_mean_std(index)
-            res11, res21 = self.get_gene_list(cut_of_index1)
-            info1 = self.get_more_info(res11, res21, cut_of_index1)
-            return res11, res21, len(cut_of_index1), info1
-        else:
-            cut_of_index = self.overlap(index, tm)
-            res1, res2 = self.get_gene_list(cut_of_index)
-            info = self.get_more_info(res1, res2, cut_of_index)
-            return res1, res2, len(cut_of_index), info
+        res1, res2 = self.get_gene_list(cut_of_index)
+        info = self.get_more_info(res1, res2, cut_of_index)
+        next_cal = [res1, res2, len(cut_of_index)]
+        # print(next_cal)
+
+        return next_cal, info
+
+

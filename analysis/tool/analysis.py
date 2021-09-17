@@ -1,7 +1,10 @@
+import time
+
 import nupack
 from nupack import *
 from nupack import SetSpec, RawStrand, RawComplex, Strand, Complex, Tube, tube_analysis, \
     Model, complex_analysis, complex_concentrations, Domain, TargetStrand, analysis
+
 
 class Analysis:
 
@@ -22,110 +25,106 @@ class Analysis:
         self.second_check = 1e-14  # 第二次验证时的浓度
         self.temp = 37  # 验证 时的温度
 
-    # def get_more_info(self):
-    #     info = []  #
-    #     for i, tem_gene in enumerate(self.list_g1):  # TODO 全部更换成这样
-    #         ind = 'F{0}'.format(i+1)
-    #         info.append([ind, tem_gene, len(tem_gene)])
-    #
-    #     for i, tem_gene in enumerate(self.list_g2):
-    #         ind = 'L{0}'.format(self.len_g1+i+1)
-    #         info.append([ind, tem_gene, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
-    #
-    #     return info
-
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况
         tubes = []
         count = 1
         for i in range(self.len_gene):
             for j in range(i, self.len_gene):
-                strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): self.c_gene,
-                           Strand(self.gene_list[j], name="t{0}:R{1}".format(count, j + 1)): self.c_gene}
-
+                strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i)): self.c_gene,
+                           Strand(self.gene_list[j], name="t{0}:R{1}".format(count, j)): self.c_gene}
                 tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=2), name='t{0}'.format(count)))
                 count += 1
         return tubes
 
     def get_tube(self, index1):
-        # 找到能与之对应的
-        tem_err_list = []
+        # 找到能与之对应的 index
         if index1 < self.len_g1:
             if self.len1 % 2 == 0:  # 边界
-                tem_err_list.append([index1, index1 + self.len_g1, index1 + self.len_g1 + 1])
+                tem_err_list=[index1, index1 + self.len_g1, index1 + self.len_g1 + 1]
             else:
-                tem_err_list.append([index1, index1 + self.len_g1])
+                tem_err_list=[index1, index1 + self.len_g1]
         else:
             if index1 == self.len_g1 + 1:
-                tem_err_list.append([index1, index1 - self.len_g1])
+                tem_err_list=[index1, index1 - self.len_g1]
             elif index1 == self.len_g1 + self.len_g2 and self.len1 % 2 == 0:
-                tem_err_list.append([index1, index1 - self.len_g1 - 1])
+                tem_err_list=[index1, index1 - self.len_g1 - 1]
             else:
-                tem_err_list.append([index1, index1 - self.len_g1 - 1, index1 - self.len_g1])
+                tem_err_list=[index1, index1 - self.len_g1 - 1, index1 - self.len_g1]
         return tem_err_list
 
     def analysis_two(self):
         my_model = Model(material='dna', celsius=self.temp)  # 温度
         tubes = self.get_strands_tube_tow()  # 得到每个试管中都有两条DNA单链
         tube_results = tube_analysis(tubes=tubes, model=my_model)
-        # print(tube_results)
         all_conc = {}
         for t in tubes:
             for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
-                # print('The equilibrium concentration of %s is %.2e M' % (my_complex.name, conc))
-                # if my_complex.name not in all_conc:
                 all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
 
-        new_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
+        all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
-        error = []  # 怀疑是错配的
-        k_cou = 0  # 记录浓度大于某个值的
+        error = {}  # 怀疑是错配的
         # 验证
-        # 找出那两个的相邻的放到一起，然后反应，看下最后的结果
-        error_end = []  # 经过校验后还是错配的
-
-        for k, v in new_conc:
-            # print(v)
-            if k.count("+") == 1 and v > self.first_check:  #  将浓度换成输入的浓度
-                # TODO 出现很多重复的，（试管名字不一样，但是序列时一样的）
-                # print(k, v)
-                k_cou += 1
+        for k, v in all_conc:
+            if k.count("+") == 1 and v > self.first_check:  # 将浓度换成输入的浓度
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
                 tem_split = k.split('+')
                 t1 = int(tem_split[0].split(':')[1][1:])  # 单链序号
                 t2 = int(tem_split[1].split(':')[1][1:-1])
+                if t1 > t2:
+                    t1, t2 = t2, t1
 
-                if abs(t1 - t2) - self.len_g1 not in [0, 1]:  # 错配
-                    error.append(k)
-
-                    print("验证:{0},{1}".format(t1, t2))
-                    print(k, v)
-                    tem_err_list = self.get_tube(t1)
-                    tem_err_list.extend(self.get_tube(t2))
-
-                    if self.verification_two(tem_err_list):
-                        error_end.append(k)
-
+                if t2 - t1 - self.len_g1 not in [-1, 0]:  # 错配
+                    ste = '{0},{1}'.format(t1, t2)
+                    if ste in error and v < error[ste]:
+                        continue
+                    else:
+                        error[ste] = v
             elif v < self.first_check:  #
                 break
-        # if len(error_end):
-        #     return False
-        print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
-        print("出错的{0}".format(error))
-        print("最终检测还是出错的{0}".format(error_end))
-        print("浓度大于1e-9数{0}".format(k_cou))
-        print('总数{0}'.format(len(new_conc)))
+
+        # 找出那两个的相邻的放到一起，然后反应，看下最后的结果
+        # error_end = []  # 经过校验后还是错配的
+        # for enu in error:
+        #     str = enu.split(',')
+        #     tem_err_list = [self.get_tube(int(str[0])), self.get_tube(int(str[1]))]
+        #     if self.verification_two(tem_err_list):
+        #         error_end.append(enu)
+
+        tem_info = {}
+        for key, val in error.items():
+            arr = key.split(',')
+            arr = [int(i) for i in arr]
+
+            if arr[0] >= self.len_g1:
+                str1 = 'R{0}'.format(arr[0] - self.len_g1)
+            else:
+                str1 = 'F{0}'.format(arr[0])
+
+            if arr[1] >= self.len_g1:
+                str2 = 'R{0}'.format(arr[1] - self.len_g1)
+            else:
+                str2 = 'F{0}'.format(arr[1])
+            tem_info[str1+','+str2] = val
+        print(len(tem_info), tem_info)
+
+        # print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
+        # print("出错的{0},{1}".format(len(error), error))
+        # print("最终检测还是出错的{0}".format(error_end))
+        # print('总数{0}'.format(len(all_conc)))
+        return tem_info
 
     def verification_two(self, list1):
         # 验证错配的是否有问题
-        # print(list1)
         set1 = set()
         strands = {}
         for i in range(len(list1)):
             for j in range(len(list1[i])):
                 if j == 0:
                     set1.add(list1[i][j])
-                    strands[Strand(self.gene_list[list1[i][j] - 1], name="E:{1}:{0}".format(list1[i][j], i))] = self.c_gene * 2  # 改正浓度
+                    strands[Strand(self.gene_list[list1[i][j] - 1],
+                                   name="E:{1}:{0}".format(list1[i][j], i))] = self.c_gene * 2  # 改正浓度
                 elif Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j])) in strands.keys():
                     strands[Strand(self.gene_list[list1[i][j] - 1], name=str(list1[i][j]))] = self.c_gene * 2
                 else:
@@ -152,19 +151,18 @@ class Analysis:
                 # print(name, conc)
 
         new_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)
-        print("-------------------------------")
+        # print("-------------------------------")
         # print(new_conc)
 
     def get_strands_tube_three(self):
         tubes = []
         count = 1  # 记录试管数目
-
         for i in range(self.len_gene):
             for j in range(i, self.len_gene):
                 for k in range(j, self.len_gene):
-                    strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i + 1)): self.c_gene,
-                               Strand(self.gene_list[j], name="t{0}:M{1}".format(count, j + 1)): self.c_gene,
-                               Strand(self.gene_list[k], name="t{0}:R{1}".format(count, k + 1)): self.c_gene}
+                    strands = {Strand(self.gene_list[i], name="t{0}:L{1}".format(count, i)): self.c_gene,
+                               Strand(self.gene_list[j], name="t{0}:M{1}".format(count, j)): self.c_gene,
+                               Strand(self.gene_list[k], name="t{0}:R{1}".format(count, k)): self.c_gene}
                     tubes.append(Tube(strands=strands, complexes=SetSpec(max_size=3),  # max_size,使用变量代替？
                                       name='t{0}'.format(count)))  # complexes defaults to [A, B]
                     count += 1
@@ -173,47 +171,63 @@ class Analysis:
     def analysis_three(self):
         my_model = Model(material='dna', celsius=self.temp)
         tubes = self.get_strands_tube_three()  # 得到每个试管中都有两条DNA单链
+        start = time.time()
         tube_results = tube_analysis(tubes=tubes, model=my_model)
-        # print(tube_results.complexes)
+        print("analysis time:{0}".format(time.time() - start))
         all_conc = {}  # 记录结果
         for t in tubes:
             for my_complex, conc in tube_results.tubes[t].complex_concentrations.items():
                 all_conc[my_complex.name] = conc  # 反应后每个试管中DNA的浓度
+        all_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
 
-        new_conc = sorted(all_conc.items(), key=lambda d: d[1], reverse=True)  # 排序
-
-        error = []  # 怀疑是错配的
+        error = {}  # 怀疑是错配的
         k_cou = 0  # 记录浓度大于某个值的
-        error_end = []  # 经过校验后还是错配的
 
-        for k, v in new_conc:
+        for k, v in all_conc:
             if k.count("+") == 2 and v > self.first_check:  # 将浓度换成输入的浓度
-                # print(k, v)
                 k_cou += 1
                 # 根据：分割k， 然后根据名字具有顺序关系，然后确定是不是正确的配对
                 tem_split = k.split('+')
-
                 t1 = int(tem_split[0].split(':')[1][1:])
                 t2 = int(tem_split[1].split(':')[1][1:])
                 t3 = int(tem_split[2].split(':')[1][1:-1])
                 set_t = {abs(t1 - t2), abs(t1 - t3), abs(t2 - t3)}
 
-                if set_t != {1, self.len_g1 + 1, self.len_g1 + 2}:
-                    error.append(k)
-                    # 添加验证
-                    print("验证:{0},{1},{2}".format(t1, t2, t3))
-                    tem_err_list = self.get_tube(t1)
-                    tem_err_list.extend(self.get_tube(t2))
-                    tem_err_list.extend(self.get_tube(t3))
+                if set_t != {1, self.len_g1, self.len_g1 - 1}:
+                    tem_arr = [t1, t2, t3]
+                    tem_arr.sort()
+                    key = ''
+                    for i in tem_arr:
+                        if i >= self.len_g1:
+                            key = key + 'R{0},'.format(i - self.len_g1)
+                        else:
+                            key = key + 'F{0},'.format(i)
+                    key = key[:-1]
+                    if key in error and v < error[key]:
+                        continue
+                    else:
+                        error[key] = v
 
-                    if self.verification_two(tem_err_list):
-                        error_end.append(k)
+            elif v < self.first_check:  #
+                break
 
-        print("目标:{0},list1:{1},list2:{2}".format(int(self.len1 / 2), self.len_g1, self.len_g2))
+        # second check
+        error_end = []  # 经过校验后还是错配的
+
+        # 添加验证
+        # print("验证:{0},{1},{2}".format(t1, t2, t3))
+        # tem_err_list = self.get_tube(t1)
+        # tem_err_list.extend(self.get_tube(t2))
+        # tem_err_list.extend(self.get_tube(t3))
+        # if self.verification_two(tem_err_list):
+        #     error_end.append(k)
+
+        # print("目标:{0},list1:{1},list2:{2}".format(int(self.len1 / 2), self.len_g1, self.len_g2))
         print("出错的:{0},{1}".format(len(error), error))
-        print("最终检测还是出错的{0}".format(error_end))
-        print("浓度大于1e-9数:{0}".format(k_cou))
-        print('总数:{0}'.format(len(new_conc)))
+        # print("最终检测还是出错的{0}".format(error_end))
+        # print("浓度大于1e-9数:{0}".format(k_cou))
+        # print('总数:{0}'.format(len(all_conc)))
+        return error
 
     def get_strands(self):
         name = 65
@@ -235,6 +249,5 @@ class Analysis:
         print(tube_results)
 
     def analysis_primer(self, primer, list):
-
 
         pass

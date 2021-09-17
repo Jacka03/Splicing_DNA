@@ -4,18 +4,6 @@
     <script>
 
 
-        function getResultType(flag) {
-            var table = document.getElementById()
-            if(flag == 'gap') {
-
-            } else {
-
-            }
-
-        }
-
-
-
     </script>
 </head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -27,9 +15,7 @@ gene<br>
 </label><br>
 length:<label>{{ gene_len }}</label><br>
 <br>
-result type:
-<input type="radio" name="result_type" onclick="getResultType(this.value)" value="gap" checked/>gap
-<input type="radio" name="result_type" onclick="getResultType(this.value)" value="gapless"/>gapless
+result type:{{ res_type }}
 <br>
 <hr>
 
@@ -93,6 +79,25 @@ result type:
     </tr>
 </table>
 
+<table border="1" cellspacing="0">
+    {% if analy_info_two %}
+        {% for key, value in analy_info_two.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+
+    {% if analy_info_three %}
+        {% for key, value in analy_info_three.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value }}</td>
+            </tr>
+        {% endfor %}
+    {% endif %}
+</table>
 
 </body>
 
