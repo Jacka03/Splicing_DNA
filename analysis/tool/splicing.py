@@ -18,6 +18,7 @@ class Splicing:
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene']  # 基因序列
         self.res_type = input_info['res_type']  # 结果类型
+        self.result = input_info['result']
 
         self.min_len = 20
         self.max_len = 30
@@ -290,7 +291,9 @@ class Splicing:
         return index_list, tm_list
 
     def overlap(self, index_list, tm_list):
-        index_list = index_list.astype(int)
+        # print(index_list)
+        # index_list = index_list.astype(int)
+        index_list = [int(i) for i in index_list]
         gene_list = []
         for i in range(len(tm_list)):  # 将gene截取出来存放在一个二维list中
             # 【原来第一个切割位点，修改后第一个切割位点，原来第二个切割位点，修改后第二个切割位点，修改后片段tm】
@@ -492,12 +495,13 @@ class Splicing:
 
     def return_result(self, index, tm):
         if self.res_type == 'gapless':
-            cut_of_ind = self.cal_mean_std(index)
+            return self.cal_mean_std(index)
         elif self.res_type == 'gap':
-            cut_of_ind = self.overlap(index, tm)
-        return cut_of_ind
+            return self.overlap(index, tm)
 
     def cal(self):
+        if self.result == 'res2':
+            self.gene = self.gene[::-1]
 
         index, tm = self.cal_next_tm()
         # show_w(index, tm, "f")
@@ -508,7 +512,14 @@ class Splicing:
         index = np.insert(index, 0, [0])
         index, tm = self.iteration(index, tm)
 
+        if self.result == 'res2':
+            self.gene = self.gene[::-1]
+            tm = tm[::-1]
+            index = [len(self.gene) - i for i in index]
+            index = index[::-1]
+
         cut_of_index = self.return_result(index, tm)
+        # print(cut_of_index)
 
         res1, res2 = self.get_gene_list(cut_of_index)
         info = self.get_more_info(res1, res2, cut_of_index)
