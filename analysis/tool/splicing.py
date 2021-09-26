@@ -17,12 +17,15 @@ class Splicing:
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene']  # 基因序列
+        self.gene_len = len(input_info['gene'])  # 基因序列
         self.res_type = input_info['res_type']  # 结果类型
         self.result = input_info['result']
 
-        self.min_len = 20
-        self.max_len = 30
+        self.min_len = int(input_info['min_len'])
+        self.max_len = int(input_info['max_len'])
         self.count = 20
+
+        self.tail = False
 
     def cal_tm(self, temp_gene):
         """
@@ -203,6 +206,7 @@ class Splicing:
             if len(tem_res) != 0:
                 tem_res = self.choose(tem_res, self.count)
                 result = np.delete(tem_res, -1, axis=1)  # 删除最后一列
+
         # 挑选结果
         fir_ans_tem = self.choose(fir_ans_tem)
         if len(answer1_tem) > 0 and len(answer1_tem[0]) == len(answer1_tem[-1]):
@@ -481,6 +485,10 @@ class Splicing:
             'std': round(np.std(data), 2),
             'result': result
         }
+        if self.tail:
+
+            overlap_data['tail'] = self.gene[self.gene_len: cut_of_index[-1][2]]
+            print(overlap_data)
 
         return overlap_data
 
@@ -499,14 +507,48 @@ class Splicing:
         elif self.res_type == 'gap':
             return self.overlap(index, tm)
 
+    def input_tail(self, tem_index, tem_tm):
+        tem_index = tem_index.tolist()
+        tem_tm = tem_tm.tolist()
+        str = "CAGTTCCTGAAGATAGATTAAGGCACCGTGATGAACGTATGCACAGCTT"
+        tem_gene = self.gene + str
+
+        tem_ans = []
+        for i in range(self.max_len - self.min_len):
+            end_cut = int(tem_index[-1] + self.min_len + i)
+            end_tm = self.cal_tm(tem_gene[int(tem_index[-1]): end_cut])
+            # cal
+            tm_list = tem_tm + [end_tm]
+            end_std = np.std(tm_list)
+            tem_ans.append([end_cut, end_tm, end_std])
+
+        tem_res = self.choose(tem_ans, 1)
+        tem_index.append(tem_res[0][0])
+        tem_tm.append(tem_res[0][1])
+
+        # print(tem_index)
+        # print(tem_tm)
+        self.gene = tem_gene
+        self.tail = True
+
+        return tem_index, tem_tm
+
+
     def cal(self):
         if self.result == 'res2':
             self.gene = self.gene[::-1]
 
         index, tm = self.cal_next_tm()
+        print(len(index))
+
         # show_w(index, tm, "f")
         # 初步贪心得到的结果，将tm取均值，然后当做起点
         index, tm = self.cal_next_tm(float(np.mean(tm)))
+
+        if len(index) % 2 == 0:  # add tail
+            index, tm = self.input_tail(index, tm)
+        print(len(index))
+
         # show_w(index, tm, "init")
         # 对整体遍历
         index = np.insert(index, 0, [0])
@@ -523,6 +565,7 @@ class Splicing:
 
         res1, res2 = self.get_gene_list(cut_of_index)
         info = self.get_more_info(res1, res2, cut_of_index)
+
         next_cal = [res1, res2, len(cut_of_index)]
         # print(next_cal)
 

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-{#    <meta charset="UTF-8">#}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    {#    <meta charset="UTF-8">#}
     <title>Splicing_DNA</title>
 
     <style type="text/css">
@@ -114,7 +114,7 @@
                 </td>
             </tr>
 
-             <tr>
+            <tr>
                 <td>
                     Tris<sup>2+</sup> (1-1000mM)
                 </td>
@@ -139,26 +139,28 @@
                     <input class="input" name="primer" type="number" value="400"> nM
                 </td>
             </tr>
-{#            <tr>#}
-{#                <td>#}
-{#                    temperature#}
-{#                </td>#}
-{#                <td>#}
-{#                    <input class="input" name="temperature" type="number" value="37.5"> &#176;C#}
-{#                </td>#}
-{#            </tr>#}
+
 
         </table>
         <br>
     </div>
 
+    <h3>overlap length</h3>
+    <div class="mydiv" >
+            <br>
+    min <input type="number" name="min_len" value="20" class="input">
+    <br>
+    max <input type="number" name="max_len" value="30" class="input">
+    </div>
+
+
     <h3>result type</h3>
-    <div class="result">
+    <div class="mydiv">
         <input name="res_type" type="radio" value="gapless" checked>gapless
         <input name="res_type" type="radio" value="gap">gap
     </div>
 
-    <h3>Is the gene is too long </h3>
+    <h3>Assembly Tm</h3>
     <div class="mydiv">
         <input name="choose" onclick="ch(this.value)" type="radio" value="no" checked>no
         <input name="choose" onclick="ch(this.value)" type="radio" value="yes">yes

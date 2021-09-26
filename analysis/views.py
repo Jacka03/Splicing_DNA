@@ -39,6 +39,8 @@ class HomeView(View):
             'gene': tem_gene,  # 输入基因序列
             'res_type': data.get('res_type'),  # 结果：gepless?gap
             'result':data.get('result'),
+            'min_len':data.get('min_len'),
+            'max_len':data.get('max_len'),
             # 各种离子浓度
             'Na': float(data.get('Na')),
             'K': float(data.get('K')),
@@ -64,6 +66,8 @@ class HomeView(View):
             'mean': info.get('mean'),
             'std': info.get('std')
         }
+        if info.get('tail'):
+            context['tail'] = info.get('tail')
 
         if data.get('veri') == 'yes':
             # 分析过程

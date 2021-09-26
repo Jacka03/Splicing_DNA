@@ -248,6 +248,3 @@ class Analysis:
         tube_results = tube_analysis(tubes=[t1], model=my_model)
         print(tube_results)
 
-    def analysis_primer(self, primer, list):
-
-        pass
