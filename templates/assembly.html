@@ -134,6 +134,7 @@
                             <el-tabs type="border-card" style="border: 0" v-model="activeName" @tab-click="handleClick">
 
                                 <el-tab-pane label="input" name="input">
+
                                     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px"
                                              class="demo-dynamic" style="border: 0; padding: 0">
                                         <h3>Email address</h3>
@@ -167,7 +168,7 @@
                                                       v-model="dynamicValidateForm.gene"></el-input>
                                         </el-form-item>
                                         <el-col :span="8" style="margin-left: 257px">
-                                            <span style="float: right; font-size: 14px">length: {{remnant}}</span>
+                                            <span style="float: right; font-size: 14px">length: {[remnant]}</span>
                                         </el-col>
                                         <br>
 
@@ -205,7 +206,9 @@
                                                                           @blur="printIndex(scope.$index, scope.row)"
                                                                           style="width: 100px; margin-left: -100px;"
                                                                           v-model="scope.row.name"></el-input>
-                                                                {{scope.row.unit}}
+
+                                                                {[ scope.row.unit ]}
+
                                                             </el-form-item>
                                                         </template>
 
@@ -273,9 +276,9 @@
 
                                         <el-form-item style="margin-top: 30px">
                                             <el-button style="margin-right: 70px; margin-left: 120px" type="primary"
-                                                       @click="submitForm('dynamicValidateForm')">submit
+                                                       @click="submitForm(dynamicValidateForm)">submit
                                             </el-button>
-                                            <el-button @click="resetForm('dynamicValidateForm')">default</el-button>
+                                            <el-button @click="resetForm(dynamicValidateForm)">default</el-button>
                                         </el-form-item>
                                     </el-form>
                                 </el-tab-pane>
@@ -303,11 +306,14 @@
 </body>
 
 <script src="../static/js/vue.js"></script>
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/js/axios-0.18.0.js"></script>
 <script src="../static/element-ui/lib/index.js"></script>
 
 <script>
     new Vue({
         el: '#app',
+        delimiters: ['{[', ']}'],
         data() {
             return {
                 activeIndex: '2',
@@ -317,7 +323,6 @@
                 validation: 'No',
                 remnant: '0',
 
-
                 dynamicValidateForm: {
                     email: '',
                     gene: '',
@@ -326,31 +331,38 @@
                     pools: '1',
                     tableData: [
                         {
-                            name: '1.1',
+                            name: 'Na',
+                            data: '1.1',
                             ion: 'Na<sup>+</sup> (0.5-1.5M)',
                             unit: 'M',
                         }, {
-                            name: '50',
+                            name: 'K',
+                            data: '50',
                             ion: 'Na<sup>+</sup> / K<sup>+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
-                            name: '8',
+                            name: 'Mg',
+                            data: '8',
                             ion: 'Mg<sup>2+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
-                            name: '4',
+                            name: 'dNTPs',
+                            data: '4',
                             ion: 'dNTPs (1-1000mM)',
                             unit: 'mM',
                         }, {
-                            name: '10',
+                            name: 'Tris',
+                            data: '10',
                             ion: 'Tris<sup>2+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
-                            name: '10',
+                            name: 'oligo',
+                            data: '10',
                             ion: 'oligo (0.1-1000nM)',
                             unit: 'mM',
                         }, {
-                            name: '400',
+                            name: 'primer',
+                            data: '400',
                             ion: 'primer (0.1-1000nM)',
                             unit: 'mM',
                         }]
@@ -362,6 +374,24 @@
 
         },
         methods: {
+            submitForm(formName) {
+                {#console.log(formName);#}
+                {#console.log(this.dynamicValidateForm.tableData);#}
+                axios.post("/assembly/", formName)
+                    .then(function (response) {
+                        console.log(response);
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+
+                {#axios.post({#}
+                {#    url: "/aa",#}
+                {#    data: formName#}
+                {# })#}
+
+            },
+
             printIndex(index, row) {
 
                 console.log(index, row);
@@ -380,18 +410,6 @@
             handleSelect() {
 
             },
-
-            submitForm(formName) {
-                console.log(formName);
-                // this.$refs[formName].validate((valid) => {
-                //     if (valid) {
-                //         alert('submit!');
-                //     } else {
-                //         console.log('error submit!!');
-                //         return false;
-                //     }
-                // });
-            },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
                 this.remnant = '0';
@@ -401,16 +419,16 @@
                 this.validation = 'No';
             },
             removeDomain(item) {
-                var index = this.dynamicValidateForm.domains.indexOf(item)
-                if (index !== -1) {
-                    this.dynamicValidateForm.domains.splice(index, 1)
-                }
+                {#var index = this.dynamicValidateForm.domains.indexOf(item)#}
+                {#if (index !== -1) {#}
+                {#    this.dynamicValidateForm.domains.splice(index, 1)#}
+                {# }#}
             },
             addDomain() {
-                this.dynamicValidateForm.domains.push({
-                    value: '',
-                    key: Date.now()
-                });
+                {#this.dynamicValidateForm.domains.push({#}
+                {#    value: '',#}
+                {#    key: Date.now()#}
+                {# });#}
             }
         }
     });

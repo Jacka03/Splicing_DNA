@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -17,20 +19,38 @@ class DownloadView(View):     # 导出excel数据
         return HttpResponse("get")
 
 
-# class AnalysisView(View):
-#
-#     def get(self, request):
-#         # return HttpResponse("get")
-#         return render(request, 'result.html')
-#
-#     def post(self, request):
-#         return HttpResponse('post')
+class AssemblyView(View):
+    def get(self, request):
+        return render(request, 'assembly.html')
 
+    def post(self, request):
+        data = json.loads(request.body)
+        # tableData
+        print(data)
+        data['tableData'] = self.get_tableData(data['tableData'])
+        print(data)
+
+        context = {"test": 124}
+        return render(request, 'assembly.html', context)
+
+    def get_tableData(self, data_list):
+        tableData = {}
+        for data in data_list:
+            tableData[data['name']] = float(data['data'])
+        print(tableData)
+        return tableData
+        pass
 
 class HomeView(View):
     def get(self, request):
         # return HttpResponse("get")
-        return render(request, 'home.html')
+        return render(request, 'assembly.html')
+
+    # def post(self, request):
+    #     data = request.body
+    #     print(data)
+    #
+    #     return render(request, 'assembly.html')
 
     def post(self, request):
         data = request.POST

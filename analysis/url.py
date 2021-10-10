@@ -6,7 +6,8 @@ from analysis import views
 urlpatterns = [
     # path('', views.index, name='home'),
     path('', views.HomeView.as_view()),
+    path('assembly/', views.AssemblyView.as_view()),
     # path('analysis/', views.AnalysisView.as_view()),
-    path('export_excel/', views.DownloadView.as_view()),
+    # path('export_excel/', views.DownloadView.as_view()),
 
 ]
