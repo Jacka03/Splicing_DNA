@@ -51,9 +51,9 @@
 <body>
 
 <form {#action="#" #} method="post">
-    <h3>address</h3>
+    <h3>Address</h3>
     <div class="mydiv">
-        email:<input name="email" type="email">
+        Email:<input name="email" type="email"> Required.
     </div>
     <h3>Gene infrmation</h3>
     <div class="mydiv">
@@ -146,11 +146,11 @@
     </div>
 
     <h3>overlap length</h3>
-    <div class="mydiv" >
-            <br>
-    min <input type="number" name="min_len" value="20" class="input">
-    <br>
-    max <input type="number" name="max_len" value="30" class="input">
+    <div class="mydiv">
+        <br>
+        min <input type="number" name="min_len" value="20" class="input">
+        <br>
+        max <input type="number" name="max_len" value="30" class="input">
     </div>
 
 
@@ -160,8 +160,19 @@
         <input name="res_type" type="radio" value="gap">gap
     </div>
 
-    <h3>Assembly Tm</h3>
+    <h3>Long DNA Assembly(optional) </h3>
+
+
     <div class="mydiv">
+        Sequence will be partitioned into #of pools<br><br>
+        <div class="mydiv">
+            # of pools: <input type="number" name="pools" value="1" class="input"><br/>
+            Pool primer concentration(0.1-1000nM): <input name="pool_primer" type="number" value="400" class="input">nM
+
+        </div>
+    </div>
+
+    <div class="mydiv" style="display: none">
         <input name="choose" onclick="ch(this.value)" type="radio" value="no" checked>no
         <input name="choose" onclick="ch(this.value)" type="radio" value="yes">yes
     </div>

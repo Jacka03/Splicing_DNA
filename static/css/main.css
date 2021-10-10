@@ -1,0 +1,59 @@
+html, body, #app {
+    margin: 0;
+    height: 100%;
+}
+
+.el-main {
+    background-color: #E9EEF3;
+    color: #333;
+    /*height: 100% !important;*/
+    min-height: 500px;
+}
+
+/*--------------------------------*/
+
+.font-style {
+    font-size: 52px;
+    text-align: center;
+    line-height: 76px;
+    vertical-align: middle
+}
+
+.head-style {
+    background: #9de78a;
+    height: 76px !important;
+    border-radius: 4px;
+}
+
+/*------------------------------*/
+
+.menu-item {
+    height: 30px !important;
+    line-height: 30px !important;
+}
+
+.main-height {
+    min-height: 600px;
+    background-color: #8c939d;
+}
+
+.main-style {
+    background-color: #85e3b0;
+    width: 100%;
+    /*min-height: 570px;*/
+}
+
+/*------------------------*/
+
+.footer-font {
+    font-size: 20px;
+    text-align: center;
+    line-height: 30px;
+    vertical-align: middle
+}
+
+.footer-style {
+    background: #a3a8a1;
+    height: 30px !important;
+    border-radius: 3px;
+}

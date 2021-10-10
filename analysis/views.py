@@ -30,7 +30,7 @@ class DownloadView(View):     # 导出excel数据
 class HomeView(View):
     def get(self, request):
         # return HttpResponse("get")
-        return render(request, 'test.html')
+        return render(request, 'home.html')
 
     def post(self, request):
         data = request.POST
