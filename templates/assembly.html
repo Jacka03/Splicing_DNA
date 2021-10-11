@@ -133,7 +133,8 @@
                     <el-container>
                         <div id="show" class="main-height main-style" style="background-color: #eeeeee;margin: 0">
 
-                            <el-tabs type="border-card" style="border: 0" v-model="activeName" @tab-click="handleClick">
+                            <el-tabs type="border-card" style="border: 0" v-model="activeName" @tab-click="handleClick"
+                                     ref="tabs">
 
                                 <el-tab-pane label="input" name="input">
                                     <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="100px"
@@ -235,10 +236,10 @@
 
                                         <h3>Result type</h3>
                                         <el-form-item prop="result_type">
-                                            <el-radio v-model="dynamicValidateForm.result_type" label="gapless">
+                                            <el-radio v-model="dynamicValidateForm.result_type" label="Gapless">
                                                 Gapless
                                             </el-radio>
-                                            <el-radio v-model="dynamicValidateForm.result_type" label="gap">Gap
+                                            <el-radio v-model="dynamicValidateForm.result_type" label="Gap">Gap
                                             </el-radio>
                                         </el-form-item>
 
@@ -268,9 +269,9 @@
                                         <h3>Is validation required</h3>
                                         <el-form-item prop="validation">
                                             <el-radio style="width: 76px" v-model="dynamicValidateForm.validation "
-                                                      label="no">No
+                                                      label="No">No
                                             </el-radio>
-                                            <el-radio v-model="dynamicValidateForm.validation " label="yes">Yes
+                                            <el-radio v-model="dynamicValidateForm.validation " label="Yes">Yes
                                             </el-radio>
                                         </el-form-item>
 
@@ -319,56 +320,55 @@
             return {
                 activeIndex: '2',
 
-
                 dynamicValidateForm: {
                     email: '758168660@qq.com',
-                    remnant: '0',
-
-                    min_len: '20',
-                    max_len: '30',
-                    result_type: 'gap',
-                    validation: 'no',
-                    pools: '1',
+                    remnant: 0,
+                    result: 'res1',
+                    min_len: 20,
+                    max_len: 30,
+                    result_type: 'Gap',
+                    validation: 'No',
+                    pools: 1,
                     tableData: [
                         {
                             name: 'Na',
-                            data: '1.1',
+                            data: 1.1,
                             ion: 'Na<sup>+</sup> (0.5-1.5M)',
                             unit: 'M',
                         }, {
                             name: 'K',
-                            data: '50',
+                            data: 50,
                             ion: 'Na<sup>+</sup> / K<sup>+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
                             name: 'Mg',
-                            data: '8',
+                            data: 8,
                             ion: 'Mg<sup>2+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
                             name: 'dNTPs',
-                            data: '4',
+                            data: 4,
                             ion: 'dNTPs (1-1000mM)',
                             unit: 'mM',
                         }, {
                             name: 'Tris',
-                            data: '10',
+                            data: 10,
                             ion: 'Tris<sup>2+</sup> (1-1000mM)',
                             unit: 'mM',
                         }, {
                             name: 'oligo',
-                            data: '10',
+                            data: 10,
                             ion: 'oligo (0.1-1000nM)',
                             unit: 'mM',
                         }, {
                             name: 'primer',
-                            data: '400',
+                            data: 400,
                             ion: 'primer (0.1-1000nM)',
                             unit: 'mM',
                         }],
                     name: '',
                     description: '',
-                    gene: 'ACGACGCAGCTATGGCCTCCCCGCCCACCAGGCCGCCAGCCACAACCAGCTGACTAGGTAGGCTTCCTAGGTAGGGATCCCATCCCTTCGATTCCCTACTCCCTCCCCCGATTGATTTGATTTGATTTGATTTAATTCGATTGCCTGCTTTTCAGGTCGCATGCATCATCAGATTTCAATCTCCCTTCGTTCCCTGTCCCTAATCCAATACCAATAGGGAGCAATCAGCTGCTCCTCGACGGCGAGGGAGATGTCGTCGGCCGCGGGCCAAGACAACGGAGATACCGCTGGGGACTACATCAAGTGGATGTGCGGCGCCGGTGGCCGTGCGGGCGGCGCCATGGCCAACCTCCAGCGCGGCGTTGGCTCCCTCGTCCGTGACATTGGCGACCCCTGCCTCAACCCATCCCCCGTTAAGGTTCGCCTACTCCTACTCTAGCTCCATATGGATATGGATTCGATTAGCTGTCTACATTCTATGCCATCAATTTGTTTTCCATCACTTCTCATTATACATCTCCATTGCTCTCTAAATTAAGGCTTCTCTAGCTCTATCCTATATATATACTAGTACTCCGTATATGATTCTGCTTCATCACTTATTTATTCATCATCATACCGTGAAGCTGTATAAGTCCTGTTATTTGTCATTTGGCATATGTTGTATAGATAACACTTTCAGCCCAGGGACTTTCTATTGCCACTTTTATACATATACAATCAACATTTAGCATATGTATATCCTGTACCGCTCAGTTGTACTGCTGCTTTGAAGATAATGTTTGCAAAACATATGAGCTCACACACGAGGCTAGATGCTGCATAGGCTGCACAATGGGGTAGCCATTTTGATACTTCTTAATGCTATTTATGCTGGTCCAAATGTTCATTGGTAGCCTCAGGCAGAGAATTTTAGGGAGATATTATGTCAAACTCCCTGGATTCACTATGATTATACAATATTACCCATTCAATCCATTCAAATAAATTTCCAGGTCAACTCACATATTGTACTGAAAGAAGACTAATTTGCACTAATCATATCCTTTTATCCACCAGAGTATATGAGATTGTCTTCTATATGCAATTTACTTCATATCGACATTTTTCTGCAGAATTGCAAAACTGACGCCTTGTTTTCCATCTGGAATTGTGCAGGGGAGCAAAATGCTCAAACCGGAAAAATGGCACACATGTTTTGATAATGATGGAAAGGTCATAGGTTTCCGTAAAGCCCTAAAATTCATTGTCTTAGGGGTG'
+                    gene: 'CGTTTTAAAGGGCCCGCGCGTTGCCGCCCCCTCGGCCCGCCATGCTGCTATCCGTGCCGCTGCTGCTCGGCCTCCTCGGCCTGGCCGTCGCCGAGCCTGCCGTCTACTTCAAGGAGCAGTTTCTGGACGGAGACGGGTGGACTTCCCGCTGGATCGAATCCAAACACAAGTCAGATTTTGGCAAATTCGTTCTCAGTTCCGGCAAGTTCTACGGTGACGAGGAGAAAGATAAAGGTTTGCAGACAAGCCAGGATGCACGCTTTTATGCTCTGTCGGCCAGTTTCGAGCCTTTCAGCAACAAAGGCCAGACGCTGGTGGTGCAGTTCACGGTGAAACATGAGCAGAACATCGACTGTGGGGGCGGCTATGTGAAGCTGTTTCCTAATAGTTTGGACCAGACAGACATGCACGGAGACTCAGAATACAACATCATGTTTGGTCCCGACATCTGTGGCCCTGGCACCAAGAAGGTTCATGTCATCTTCAACTACAAGGGCAAGAACGTGCTGATCAACAAGGACATCCGTTGCAAGGATGATGAGTTTACACACCTGTACACACTGATTGTGCGGCCAGACAACACCTATGAGGTGAAGATTGACAACAGCCAGGTGGAGTCCGGCTCCTTGGAAGACGATTGGGACTTCCTGCCACC'
                 },
 
                 activeName: 'input',
@@ -378,21 +378,35 @@
         },
         created() {
             this.descInput();
+
+        },
+        mounted() {
+            this.$nextTick(() => {
+                this.$refs.tabs.$children[0].$refs.tabs[1].style.display = 'none';
+            });
+
         },
         methods: {
+
             submitForm(formName) {
-                axios.post("/assembly/", formName)
-                    .then(function (response) {
-                        console.log(response);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                axios.post("/assembly/", formName).then(function (response) {
+                    console.log(response);
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
+                this.handleSelect();
+                {#this.$nextTick(() => {#}
+                {#    this.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';#}
+                {#    this.activeName = 'output';#}
+                {# });#}
+
 
             },
 
-            printIndex(index, row) {
 
+            printIndex(index, row) {
                 console.log(index, row);
                 // alert(index);
             },
@@ -402,13 +416,15 @@
             },
 
             handleClick(tab, event) {
-                console.log(tab, event);
+                // console.log(tab, event);
             },
 
             handleSelect() {
-
+                this.$nextTick(() => {
+                    this.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
+                    this.activeName = 'output';
+                 });
             },
-
 
             resetForm(formName) {
                 this.$refs[formName].resetFields();

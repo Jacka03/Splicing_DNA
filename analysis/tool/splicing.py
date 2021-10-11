@@ -17,12 +17,12 @@ class Splicing:
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene']  # 基因序列
-        self.gene_len = len(input_info['gene'])  # 基因序列
-        self.res_type = input_info['res_type']  # 结果类型
+        self.gene_len = input_info['remnant']  # 基因序列
+        self.res_type = input_info['result_type']  # 结果类型
         self.result = input_info['result']
 
-        self.min_len = int(input_info['min_len'])
-        self.max_len = int(input_info['max_len'])
+        self.min_len = input_info['min_len']
+        self.max_len = input_info['max_len']
         self.count = 20
 
         self.tail = False
@@ -502,9 +502,9 @@ class Splicing:
         return tem_res
 
     def return_result(self, index, tm):
-        if self.res_type == 'gapless':
+        if self.res_type == 'Gapless':
             return self.cal_mean_std(index)
-        elif self.res_type == 'gap':
+        elif self.res_type == 'Gap':
             return self.overlap(index, tm)
 
     def input_tail(self, tem_index, tem_tm):

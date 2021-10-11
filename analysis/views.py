@@ -20,63 +20,34 @@ class DownloadView(View):     # 导出excel数据
 
 
 class AssemblyView(View):
+
+    def get_tableData(self, data_list):
+        tableData = {}
+        for data in data_list:
+            tableData[data['name']] = data['data']
+        # print(tableData)
+        return tableData
+
     def get(self, request):
         return render(request, 'assembly.html')
 
     def post(self, request):
         data = json.loads(request.body)
-        data['tableData'] = self.get_tableData(data['tableData'])
-        print(data)
-
-        context = {"test": 124}
-        return render(request, 'assembly.html', context)
-
-    def get_tableData(self, data_list):
-        tableData = {}
-        for data in data_list:
-            tableData[data['name']] = float(data['data'])
-        # print(tableData)
-        return tableData
-
-
-class HomeView(View):
-    def get(self, request):
-        # return HttpResponse("get")
-        return render(request, 'test.html')
-
-    # def post(self, request):
-    #     data = request.body
-    #     print(data)
-    #
-    #     return render(request, 'assembly.html')
-
-    def post(self, request):
-        data = request.POST
-        tem_gene = data.get('gene_input').replace('\n', '').replace(' ', '').replace('\r', '')
-        input_info = {
-            'gene': tem_gene,  # 输入基因序列
-            'res_type': data.get('res_type'),  # 结果：gepless?gap
-            'result':data.get('result'),
-            'min_len':data.get('min_len'),
-            'max_len':data.get('max_len'),
-            # 各种离子浓度
-            'Na': float(data.get('Na')),
-            'K': float(data.get('K')),
-            'Mg': float(data.get('Mg')),
-            'dNTPs': float(data.get('dNTPs')),
-            'Tris': float(data.get('Tris')),
-            'oligo': float(data.get('oligo')),
-            'primer': float(data.get('primer')),
-        }
-
-        splic = Splicing(input_info)
+        ion = data.pop('tableData')
+        ion = self.get_tableData(ion)
+        data.update(ion)
+        data['gene'] = data['gene'].replace('\n', '').replace(' ', '').replace('\r', '')
+        # print(data)
+        splic = Splicing(data)
         # list_g1, list_g2, len1, info = splic.cal()
         next_cal, info = splic.cal()
 
+        # print(next_cal, info)
+
         context = {
-            'gene_len': len(input_info['gene']),  # 输入的序列长度
-            'gene': input_info['gene'],  # 输入的序列
-            'res_type': input_info['res_type'],  # 输入的序列
+            'gene_len': data['remnant'],  # 输入的序列长度
+            'gene': data['gene'],  # 输入的序列
+            'res_type': data['result_type'],  # 输入的序列
             'info': info.get('result'),
             'min': info.get('min'),
             'max': info.get('max'),
@@ -84,17 +55,82 @@ class HomeView(View):
             'mean': info.get('mean'),
             'std': info.get('std')
         }
+        print(context)
+
         if info.get('tail'):
             context['tail'] = info.get('tail')
 
-        if data.get('veri') == 'yes':
-            # 分析过程
-            analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
-            # info = analy.get_more_info()
-            analy_info_two = analy.analysis_two()
-            analy_info_three = analy.analysis_three()
-            context['analy_info_two'] = analy_info_two
-            context['analy_info_three'] = analy_info_three
+        # if data.get('validation') == 'Yes':
+        #     # 分析过程
+        #     analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
+        #     # info = analy.get_more_info()
+        #     analy_info_two = analy.analysis_two()
+        #     analy_info_three = analy.analysis_three()
+        #     context['analy_info_two'] = analy_info_two
+            # context['analy_info_three'] = analy_info_three
+            # print(context)
 
-        return render(request, 'result.html', context)
+        return JsonResponse(context)
+
+
+
+#
+# class HomeView(View):
+#     def get(self, request):
+#         # return HttpResponse("get")
+#         return render(request, 'test.html')
+#
+#     # def post(self, request):
+#     #     data = request.body
+#     #     print(data)
+#     #
+#     #     return render(request, 'assembly.html')
+#
+#     def post(self, request):
+#         data = request.POST
+#         tem_gene = data.get('gene_input').replace('\n', '').replace(' ', '').replace('\r', '')
+#         input_info = {
+#             'gene': tem_gene,  # 输入基因序列
+#             'res_type': data.get('res_type'),  # 结果：gepless?gap
+#             'result':data.get('result'),
+#             'min_len':data.get('min_len'),
+#             'max_len':data.get('max_len'),
+#             # 各种离子浓度
+#             'Na': float(data.get('Na')),
+#             'K': float(data.get('K')),
+#             'Mg': float(data.get('Mg')),
+#             'dNTPs': float(data.get('dNTPs')),
+#             'Tris': float(data.get('Tris')),
+#             'oligo': float(data.get('oligo')),
+#             'primer': float(data.get('primer')),
+#         }
+#
+#         splic = Splicing(input_info)
+#         # list_g1, list_g2, len1, info = splic.cal()
+#         next_cal, info = splic.cal()
+#
+#         context = {
+#             'gene_len': len(input_info['gene']),  # 输入的序列长度
+#             'gene': input_info['gene'],  # 输入的序列
+#             'res_type': input_info['res_type'],  # 输入的序列
+#             'info': info.get('result'),
+#             'min': info.get('min'),
+#             'max': info.get('max'),
+#             'range': info.get('range'),
+#             'mean': info.get('mean'),
+#             'std': info.get('std')
+#         }
+#         if info.get('tail'):
+#             context['tail'] = info.get('tail')
+#
+#         if data.get('veri') == 'yes':
+#             # 分析过程
+#             analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
+#             # info = analy.get_more_info()
+#             analy_info_two = analy.analysis_two()
+#             analy_info_three = analy.analysis_three()
+#             context['analy_info_two'] = analy_info_two
+#             context['analy_info_three'] = analy_info_three
+#
+#         return render(request, 'result.html', context)
 
