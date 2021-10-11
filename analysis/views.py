@@ -25,8 +25,6 @@ class AssemblyView(View):
 
     def post(self, request):
         data = json.loads(request.body)
-        # tableData
-        print(data)
         data['tableData'] = self.get_tableData(data['tableData'])
         print(data)
 
@@ -37,14 +35,14 @@ class AssemblyView(View):
         tableData = {}
         for data in data_list:
             tableData[data['name']] = float(data['data'])
-        print(tableData)
+        # print(tableData)
         return tableData
-        pass
+
 
 class HomeView(View):
     def get(self, request):
         # return HttpResponse("get")
-        return render(request, 'assembly.html')
+        return render(request, 'test.html')
 
     # def post(self, request):
     #     data = request.body
