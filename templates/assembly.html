@@ -95,6 +95,14 @@
             font-size: 14px;
         }
 
+
+        .el-tooltip {
+            padding: 0!important;
+        }
+        .cell {
+            padding: 3px!important;
+        }
+
     </style>
 </head>
 <body>
@@ -285,8 +293,24 @@
                                     </el-form>
                                 </el-tab-pane>
 
-                                <el-tab-pane label="output" name="output">
+                                <el-tab-pane v-loading="loading" label="output" name="output">
 
+                                    <el-table v-loading="loading" :data="goodsList" border
+                                              :row-style="{height:'26px'}"
+                                              :cell-style="{padding:3+'px'}"
+                                              :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                        <el-table-column v-for='(item,i) in dataColumn'
+                                                         :key="i" :label="item.name"
+                                                         :width="item.width"
+                                                         :cell-style="{padding:3+'px'}"
+                                                         show-overflow-tooltip>
+
+                                            <template slot-scope="scope">
+                                                {[ scope.row[i] ]}
+                                            </template>
+                                        </el-table-column>
+
+                                    </el-table>
 
                                 </el-tab-pane>
 
@@ -372,6 +396,30 @@
                 },
 
                 activeName: 'input',
+                loading: true,
+                goodsList: [],
+                dataColumn: [
+                    {
+                        name: 'index',
+                        width: 76
+                    },
+                    {
+                        name: 'gene',
+                        width: 477
+                    },
+                    {
+                        name: 'Tm',
+                        width: 60
+                    },
+                    {
+                        name: 'overlap',
+                        width: 60
+                    },
+                    {
+                        name: 'length',
+                        width: 56
+                    },
+                ]
 
             };
 
@@ -383,27 +431,35 @@
         mounted() {
             this.$nextTick(() => {
                 this.$refs.tabs.$children[0].$refs.tabs[1].style.display = 'none';
-            });
+             });
 
         },
         methods: {
 
             submitForm(formName) {
+                var that = this;
+
                 axios.post("/assembly/", formName).then(function (response) {
-                    console.log(response);
+                    that.goodsList = response.data.info;
+                    that.loading = false;
+
+                    that.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
+                    that.activeName = 'output';
+                    console.log(goodsList);
 
                 }).catch(function (error) {
+
                     console.log(error);
                 });
 
-                this.handleSelect();
+                {#this.handleSelect();#}
                 {#this.$nextTick(() => {#}
                 {#    this.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';#}
                 {#    this.activeName = 'output';#}
                 {# });#}
 
-
             },
+
 
 
             printIndex(index, row) {
