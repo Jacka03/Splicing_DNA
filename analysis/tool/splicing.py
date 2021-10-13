@@ -534,6 +534,7 @@ class Splicing:
         return tem_index, tem_tm
 
     def cal(self):
+        self.gene = self.gene.upper()
         if self.result == 'res2':
             self.gene = self.gene[::-1]
 

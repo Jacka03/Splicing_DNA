@@ -79,14 +79,19 @@ class AssemblyView(View):
             # 分析过程
             analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
             # info = analy.get_more_info()
-            analy_info_two = analy.analysis_two()
-            analy_info_three = analy.analysis_three()
-            context['analy_info_two'] = analy_info_two
-            print(context['analy_info_two'])
-            # context['analy_info_three'] = analy_info_three
-            # print(context)
+            analy_info = analy.analysis_two()
 
-        # print(context)
+            analy_info.update(analy.analysis_three())
+
+            analy_info_list = []
+            for key, value in analy_info.items():
+                analy_info_list.append({
+                'key': key,
+                'value': value,
+            })
+            context['analyInfoList'] = analy_info_list
+            print(context['analyInfoList'])
+
         return JsonResponse(context)
 
 
