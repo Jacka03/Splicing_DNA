@@ -1,5 +1,12 @@
 readme
-a project for cutting dna
+a project for assembly DNA
+
+## project
+* Python 3.7
+* Django 3+
+* mysql 5.7+
+* element-ui
+
 
 ### 完善后端处理工作
 问题： 
