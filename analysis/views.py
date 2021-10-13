@@ -32,6 +32,8 @@ class AssemblyView(View):
         return render(request, 'assembly.html')
 
     def post(self, request):
+        # return JsonResponse({'gene_len': 655, 'gene': 'CGTTTTAAAGGGCCCGCGCGTTGCCGCCCCCTCGGCCCGCCATGCTGCTATCCGTGCCGCTGCTGCTCGGCCTCCTCGGCCTGGCCGTCGCCGAGCCTGCCGTCTACTTCAAGGAGCAGTTTCTGGACGGAGACGGGTGGACTTCCCGCTGGATCGAATCCAAACACAAGTCAGATTTTGGCAAATTCGTTCTCAGTTCCGGCAAGTTCTACGGTGACGAGGAGAAAGATAAAGGTTTGCAGACAAGCCAGGATGCACGCTTTTATGCTCTGTCGGCCAGTTTCGAGCCTTTCAGCAACAAAGGCCAGACGCTGGTGGTGCAGTTCACGGTGAAACATGAGCAGAACATCGACTGTGGGGGCGGCTATGTGAAGCTGTTTCCTAATAGTTTGGACCAGACAGACATGCACGGAGACTCAGAATACAACATCATGTTTGGTCCCGACATCTGTGGCCCTGGCACCAAGAAGGTTCATGTCATCTTCAACTACAAGGGCAAGAACGTGCTGATCAACAAGGACATCCGTTGCAAGGATGATGAGTTTACACACCTGTACACACTGATTGTGCGGCCAGACAACACCTATGAGGTGAAGATTGACAACAGCCAGGTGGAGTCCGGCTCCTTGGAAGACGATTGGGACTTCCTGCCACC', 'res_type': 'Gap', 'info': [['F0', 'CCCGCGCGTTGCCGCCCCCTCGGCCCGCCATGCTGC', 65.86, 19, 36], ['R0', 'CCGAGCAGCAGCGGCACGGATAGCAGCATGGCGGGCCGAGG', 65.93, 19, 41], ['F1', 'CCGTGCCGCTGCTGCTCGGCCTCCTCGGCCTGGCCGTCG', 64.28, 19, 39], ['R1', 'TCCTTGAAGTAGACGGCAGGCTCGGCGACGGCCAGGCCGAGGAG', 65.46, 25, 44], ['F2', 'CCGAGCCTGCCGTCTACTTCAAGGAGCAGTTTCTGGACGGAGACGGGTGGA', 65.39, 25, 51], ['R2', 'TTGTGTTTGGATTCGATCCAGCGGGAAGTCCACCCGTCTCCGTCCAGAAACTG', 65.09, 28, 53], ['F3', 'CTTCCCGCTGGATCGAATCCAAACACAAGTCAGATTTTGGCAAATTCGTTCTCAGTTCCGG', 65.08, 31, 61], ['R3', 'ACCTTTATCTTTCTCCTCGTCACCGTAGAACTTGCCGGAACTGAGAACGAATTTGCCAAAATCTG', 65.64, 34, 65], ['F4', 'CAAGTTCTACGGTGACGAGGAGAAAGATAAAGGTTTGCAGACAAGCCAGGATGCACGCTT', 65.36, 24, 60], ['R4', 'GGCTCGAAACTGGCCGACAGAGCATAAAAGCGTGCATCCTGGCTTGTCTGC', 65.44, 23, 51], ['F5', 'GCTCTGTCGGCCAGTTTCGAGCCTTTCAGCAACAAAGGCCAGACGCTGG', 65.39, 25, 49], ['R5', 'GCTCATGTTTCACCGTGAACTGCACCACCAGCGTCTGGCCTTTGTTGCTGAA', 65.45, 27, 52], ['F6', 'TGGTGCAGTTCACGGTGAAACATGAGCAGAACATCGACTGTGGGGGCGGC', 65.44, 22, 50], ['R6', 'GTCTGGTCCAAACTATTAGGAAACAGCTTCACATAGCCGCCCCCACAGTCGATGTTC', 64.74, 33, 57], ['F7', 'TGTGAAGCTGTTTCCTAATAGTTTGGACCAGACAGACATGCACGGAGACTCAGAATACAACATCA', 65.18, 32, 65], ['R7', 'GGCCACAGATGTCGGGACCAAACATGATGTTGTATTCTGAGTCTCCGTGCATGTCT', 64.43, 24, 56], ['F8', 'TGTTTGGTCCCGACATCTGTGGCCCTGGCACCAAGAAGGTTCATGTCATCTTCA', 64.87, 30, 54], ['R8', 'GTTGATCAGCACGTTCTTGCCCTTGTAGTTGAAGATGACATGAACCTTCTTGGTGCCAG', 65.07, 29, 59], ['F9', 'ACTACAAGGGCAAGAACGTGCTGATCAACAAGGACATCCGTTGCAAGGATGATGAGTTT', 64.37, 30, 59], ['R9', 'CCGCACAATCAGTGTGTACAGGTGTGTAAACTCATCATCCTTGCAACGGATGTCCTT', 64.79, 27, 57], ['F10', 'ACACACCTGTACACACTGATTGTGCGGCCAGACAACACCTATGAGGTGAAGATTGACAAC', 65.4, 33, 60], ['R10', 'GGAGCCGGACTCCACCTGGCTGTTGTCAATCTTCACCTCATAGGTGTTGTCTGG', 65.22, 21, 54], ['F11', 'AGCCAGGTGGAGTCCGGCTCCTTGGAAGACGATTGGGACTTCCTGCCAC', 65.12, 26, 49], ['R11', 'TCACGGTGCCTTAATCTATCTTCAGGAACTGGGTGGCAGGAAGTCCCAATCGTCTTCC', 65.64, 32, 58], ['F12', 'CCAGTTCCTGAAGATAGATTAAGGCACCGTGA', -1, -1, 32], ['F_Primer', 'CCCGCGCGTTGCCGCCC', 66.81, -1, 17], ['R_Primer', 'TCACGGTGCCTTAATCTATCTTCAGGAACTGG', 65.64, -1, 32]], 'resInfo': [{'key': 'min', 'value': 64.28}, {'key': 'max', 'value': 65.93}, {'key': 'range', 'value': 1.65}, {'key': 'mean', 'value': 65.19}, {'key': 'std', 'value': 0.43}], 'tail': 'CAGTTCCTGAAGATAGATTAAGGCACCGTGA'})
+
         data = json.loads(request.body)
         ion = data.pop('tableData')
         ion = self.get_tableData(ion)
@@ -43,33 +45,48 @@ class AssemblyView(View):
         next_cal, info = splic.cal()
 
         # print(next_cal, info)
-
-        context = {
-            'gene_len': data['remnant'],  # 输入的序列长度
-            'gene': data['gene'],  # 输入的序列
-            'res_type': data['result_type'],  # 输入的序列
-            'info': info.get('result'),
+        res_info = {
             'min': info.get('min'),
             'max': info.get('max'),
             'range': info.get('range'),
             'mean': info.get('mean'),
             'std': info.get('std')
         }
-        print(context)
+        tem_res = []
+        for key, value in res_info.items():
+            tem = {
+                'key': key,
+                'value': value,
+            }
+            tem_res.append(tem)
+
+        # print(tem_res)
+
+        context = {
+            'gene_len': data['remnant'],  # 输入的序列长度
+            'gene': data['gene'],  # 输入的序列
+            'res_type': data['result_type'],  # 输入的序列
+            'info': info.get('result'),
+            'resInfo': tem_res
+        }
+        # print(context)
 
         if info.get('tail'):
             context['tail'] = info.get('tail')
 
-        # if data.get('validation') == 'Yes':
-        #     # 分析过程
-        #     analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
-        #     # info = analy.get_more_info()
-        #     analy_info_two = analy.analysis_two()
-        #     analy_info_three = analy.analysis_three()
-        #     context['analy_info_two'] = analy_info_two
+
+        if data.get('validation') == 'Yes':
+            # 分析过程
+            analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
+            # info = analy.get_more_info()
+            analy_info_two = analy.analysis_two()
+            analy_info_three = analy.analysis_three()
+            context['analy_info_two'] = analy_info_two
+            print(context['analy_info_two'])
             # context['analy_info_three'] = analy_info_three
             # print(context)
 
+        # print(context)
         return JsonResponse(context)
 
 

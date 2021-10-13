@@ -193,6 +193,7 @@
                                                 <el-table
                                                         :data="dynamicValidateForm.tableData"
                                                         border
+                                                        stripe
                                                         style="width: 64%">
                                                     <el-table-column
                                                             prop="ion"
@@ -288,16 +289,20 @@
                                             <el-button style="margin-right: 70px; margin-left: 120px" type="primary"
                                                        @click="submitForm(dynamicValidateForm)">submit
                                             </el-button>
-                                            <el-button @click="resetForm('dynamicValidateForm')">default</el-button>
+                                            <el-button type="danger" @click="resetForm('dynamicValidateForm')">default
+                                            </el-button>
                                         </el-form-item>
                                     </el-form>
                                 </el-tab-pane>
 
                                 <el-tab-pane v-loading="loading" label="output" name="output">
 
+                                    <h3>Assembly result</h3>
                                     <el-table v-loading="loading" :data="goodsList" border
                                               :row-style="{height:'26px'}"
                                               :cell-style="{padding:3+'px'}"
+                                              v-if="showTable"
+                                              stripe
                                               :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
                                         <el-table-column v-for='(item,i) in dataColumn'
                                                          :key="i" :label="item.name"
@@ -311,6 +316,63 @@
                                         </el-table-column>
 
                                     </el-table>
+
+                                    <div style="padding-top: 30px">
+
+                                        <el-table v-loading="loading" :data="resInfo" border
+                                                  :row-style="{height:'26px'}"
+                                                  :cell-style="{padding:3+'px'}"
+                                                  v-if="showTable"
+                                                  stripe
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="key"#}
+                                                             align="center"
+                                                             label="key"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.key ]}
+                                                </template>
+                                            </el-table-column>
+
+                                            <el-table-column :cell-style="{padding:3+'px'}"
+                                                    {#prop="value"#}
+                                                             align="center"
+                                                             label="value"
+                                                             show-overflow-tooltip>
+                                                <template slot-scope="scope">
+                                                    {[ scope.row.value ]}
+                                                </template>
+                                            </el-table-column>
+
+                                        </el-table>
+
+                                    </div>
+
+                                    {#Validation#}
+                                    <div>
+                                        <h3>Validation information</h3>
+
+
+                                    </div>
+                                    {# <el-form-item style="margin-top: 30px">#}
+                                    <div style="padding: 30px">
+                                        <el-button
+                                                style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
+                                                type="primary"
+                                                @click="refreshTable()">another result
+                                        </el-button>
+                                        <el-button
+                                                style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
+                                                type="primary"
+                                                @click="refreshTable()">refresh table
+                                        </el-button>
+                                    </div>
+
+
+                                    {#  <el-button @click="">default</el-button>#}
+                                    {# </el-form-item>#}
 
                                 </el-tab-pane>
 
@@ -343,6 +405,9 @@
         data() {
             return {
                 activeIndex: '2',
+                showTable: true,
+                border: true,
+                stripe: true,
 
                 dynamicValidateForm: {
                     email: '758168660@qq.com',
@@ -398,6 +463,16 @@
                 activeName: 'input',
                 loading: true,
                 goodsList: [],
+                resInfo: [],
+                resColumn: [
+                    {
+                        name: 'index',
+                        width: 76
+                    }, {
+                        name: 'gene',
+                        width: 477
+                    }
+                ],
                 dataColumn: [
                     {
                         name: 'index',
@@ -431,21 +506,27 @@
         mounted() {
             this.$nextTick(() => {
                 this.$refs.tabs.$children[0].$refs.tabs[1].style.display = 'none';
-             });
+            });
 
         },
         methods: {
+            refreshTable() {
+                let that = this;
+                that.showTable = false;
+                that.$nextTick(() => that.showTable = true);
+            },
 
             submitForm(formName) {
                 var that = this;
 
                 axios.post("/assembly/", formName).then(function (response) {
                     that.goodsList = response.data.info;
+                    that.resInfo = response.data.resInfo;
                     that.loading = false;
 
                     that.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
                     that.activeName = 'output';
-                    console.log(goodsList);
+                    console.log(response.data.resInfo);
 
                 }).catch(function (error) {
 
