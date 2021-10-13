@@ -117,7 +117,7 @@
 
                     <div class="menu-style">
                         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
-                                 @select="handleSelect"
+                                 {#@select="handleSelect"#}
                                  background-color="#545c64"
                                  text-color="#fff"
                                  active-text-color="#ffd04b">
@@ -141,7 +141,8 @@
                     <el-container>
                         <div id="show" class="main-height main-style" style="background-color: #eeeeee;margin: 0">
 
-                            <el-tabs type="border-card" style="border: 0" v-model="activeName" @tab-click="handleClick"
+                            <el-tabs type="border-card" style="border: 0" v-model="activeName"
+                                     {#@tab-click="handleClick"#}
                                      ref="tabs">
 
                                 <el-tab-pane label="input" name="input">
@@ -350,14 +351,14 @@
                                     </div>
 
                                     {#Validation#}
-                                    <div>
+                                    <div v-if="showTable1">
                                         <h3>Validation information</h3>
                                         <div>
 
                                             <el-table v-loading="loading" :data="analyInfo" border
                                                       :row-style="{height:'26px'}"
                                                       :cell-style="{padding:3+'px'}"
-                                                      v-if="showTable"
+
                                                       stripe
                                                       :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
@@ -395,7 +396,7 @@
                                         <el-button
                                                 style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
                                                 type="primary"
-                                                @click="refreshTable()">refresh table
+                                                @click="refreshTable()">Refresh table
                                         </el-button>
                                     </div>
 
@@ -461,14 +462,13 @@
                                     </div>
 
                                     {#Validation#}
-                                    <div>
+                                    <div v-if="showTable2">
                                         <h3>Validation information</h3>
                                         <div>
-
                                             <el-table v-loading="loading" :data="analyInfo1" border
                                                       :row-style="{height:'26px'}"
                                                       :cell-style="{padding:3+'px'}"
-                                                      v-if="showTable"
+
                                                       stripe
                                                       :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
@@ -492,21 +492,21 @@
                                                     </template>
                                                 </el-table-column>
                                             </el-table>
-
                                         </div>
-
                                     </div>
+
+
                                     {# <el-form-item style="margin-top: 30px">#}
                                     <div style="padding: 30px">
                                         <el-button
                                                 style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
                                                 type="primary"
-                                                @click="anotherResult(dynamicValidateForm)">another result
+                                                @click="lastResult()">Previous result
                                         </el-button>
                                         <el-button
                                                 style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
                                                 type="primary"
-                                                @click="refreshTable()">refresh table
+                                                @click="refreshTable()">Refresh table
                                         </el-button>
                                     </div>
 
@@ -542,6 +542,8 @@
             return {
                 activeIndex: '2',
                 showTable: true,
+                showTable1: false,
+                showTable2: false,
                 border: true,
                 stripe: true,
 
@@ -593,7 +595,7 @@
                         }],
                     name: '',
                     description: '',
-                    gene: 'CGTTTTAAAGGGCCCGCGCGTTGCCGCCCCCTCGGCCCGCCATGCTGCTATCCGTGCCGCTGCTGCTCGGCCTCCTCGGCCTGGCCGTCGCCGAGCCTGCCGTCTACTTCAAGGAGCAGTTTCTGGACGGAGACGGGTGGACTTCCCGCTGGATCGAATCCAAACACAAGTCAGATTTTGGCAAATTCGTTCTCAGTTCCGGCAAGTTCTACGGTGACGAGGAGAAAGATAAAGGTTTGCAGACAAGCCAGGATGCACGCTTTTATGCTCTGTCGGCCAGTTTCGAGCCTTTCAGCAACAAAGGCCAGACGCTGGTGGTGCAGTTCACGGTGAAACATGAGCAGAACATCGACTGTGGGGGCGGCTATGTGAAGCTGTTTCCTAATAGTTTGGACCAGACAGACATGCACGGAGACTCAGAATACAACATCATGTTTGGTCCCGACATCTGTGGCCCTGGCACCAAGAAGGTTCATGTCATCTTCAACTACAAGGGCAAGAACGTGCTGATCAACAAGGACATCCGTTGCAAGGATGATGAGTTTACACACCTGTACACACTGATTGTGCGGCCAGACAACACCTATGAGGTGAAGATTGACAACAGCCAGGTGGAGTCCGGCTCCTTGGAAGACGATTGGGACTTCCTGCCACC'
+                    gene: 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata'
                 },
 
                 activeName: 'input',
@@ -632,7 +634,6 @@
         },
         created() {
             this.descInput();
-
         },
         mounted() {
             this.$nextTick(() => {
@@ -642,6 +643,9 @@
 
         },
         methods: {
+            lastResult() {
+                this.activeName = 'output1';
+            },
             refreshTable() {
                 let that = this;
                 that.showTable = false;
@@ -650,6 +654,16 @@
 
             submitForm(formName) {
                 var that = this;
+                that.$refs.tabs.$children[0].$refs.tabs[1].style.display = 'none';
+                that.$refs.tabs.$children[0].$refs.tabs[2].style.display = 'none';
+                that.dynamicValidateForm.result = 'res1';
+                that.resInfo1 = [];
+
+                that.showTable1 = this.dynamicValidateForm.validation !== 'No';
+                that.showTable2 = this.showTable1;
+                {#console.log(that.showTable1);#}
+                {#console.log(that.showTable2);#}
+
 
                 axios.post("/assembly/", formName).then(function (response) {
                     that.goodsList = response.data.info;
@@ -673,23 +687,30 @@
                 {# });#}
 
             },
+
             anotherResult(formName) {
-                var that = this;
-                formName.result = 'res2';
-                axios.post("/assembly/", formName).then(function (response) {
+                if (this.resInfo1.length !== 0) {
+                    this.activeName = 'output2';
+                } else {
 
-                    that.goodsList1 = response.data.info;
-                    that.resInfo1 = response.data.resInfo;
-                    that.analyInfo1 = response.data.analyInfoList;
-                    that.loading = false;
+                    var that = this;
+                    formName.result = 'res2';
+                    axios.post("/assembly/", formName).then(function (response) {
 
-                    that.$refs.tabs.$children[0].$refs.tabs[2].style.display = '';
-                    that.activeName = 'output2';
-                    console.log(response.data.resInfo);
-                }).catch(function (error) {
+                        that.goodsList1 = response.data.info;
+                        that.resInfo1 = response.data.resInfo;
+                        that.analyInfo1 = response.data.analyInfoList;
+                        that.loading = false;
 
-                    console.log(error);
-                });
+                        that.$refs.tabs.$children[0].$refs.tabs[2].style.display = '';
+                        that.activeName = 'output2';
+                        {#console.log(response.data.resInfo);#}
+                    }).catch(function (error) {
+
+                        console.log(error);
+                    });
+                }
+
             },
 
             printIndex(index, row) {
