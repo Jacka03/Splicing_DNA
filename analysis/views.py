@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
 
+from analysis import models
 from analysis.tool.analysis import Analysis
 # from analysis.tool.cal_tm import cal
 
@@ -13,7 +14,7 @@ from analysis.tool.analysis import Analysis
 from analysis.tool.splicing import Splicing
 
 
-class DownloadView(View):     # 导出excel数据
+class DownloadView(View):  # 导出excel数据
     def get(self, request):
         print("test success")
         return HttpResponse("get")
@@ -93,6 +94,7 @@ class AssemblyView(View):
         ion = self.get_tableData(ion)
         data.update(ion)
         data['gene'] = data['gene'].replace('\n', '').replace(' ', '').replace('\r', '')
+        models.GeneInfo.objects.create(gene=data['gene'], email=data['email'])
         # print(data)
         splic = Splicing(data)
         # list_g1, list_g2, len1, info = splic.cal()
@@ -128,7 +130,6 @@ class AssemblyView(View):
         if info.get('tail'):
             context['tail'] = info.get('tail')
 
-
         if data.get('validation') == 'Yes':
             # 分析过程
             analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
@@ -140,16 +141,14 @@ class AssemblyView(View):
             analy_info_list = []
             for key, value in analy_info.items():
                 analy_info_list.append({
-                'key': key,
-                'value': value,
-            })
+                    'key': key,
+                    'value': value,
+                })
             context['analyInfoList'] = analy_info_list
             # print(context['analyInfoList'])
 
         # print(context)
         return JsonResponse(context)
-
-
 
 #
 # class HomeView(View):
@@ -210,4 +209,3 @@ class AssemblyView(View):
 #             context['analy_info_three'] = analy_info_three
 #
 #         return render(request, 'result.html', context)
-

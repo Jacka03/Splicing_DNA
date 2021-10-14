@@ -21,8 +21,8 @@ class Splicing:
         self.res_type = input_info['result_type']  # 结果类型
         self.result = input_info['result']
 
-        self.min_len = input_info['min_len']
-        self.max_len = input_info['max_len']
+        self.min_len = int(input_info['min_len'])
+        self.max_len = int(input_info['max_len'])
         self.count = 20
 
         self.tail = False

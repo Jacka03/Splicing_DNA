@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -69,21 +69,21 @@ TEMPLATES = [
             ],
         },
     },
-    # {
-    #     'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
-    #     # 'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
-    #     'DIRS': [Path(BASE_DIR, 'templates')],
-    #     'APP_DIRS': True,
-    #     'OPTIONS': {
-    #         # 'environment': 'jinja2_env.Environment',  # default
-    #         'context_processors': [
-    #             'django.template.context_processors.debug',
-    #             'django.template.context_processors.request',
-    #             'django.contrib.auth.context_processors.auth',
-    #             'django.contrib.messages.context_processors.messages',
-    #         ],
-    #     },
-    # },
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # default
+        # 'BACKEND': 'django.template.backends.jinja2.Jinja2',  # jinja2
+        'DIRS': [Path(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            # 'environment': 'jinja2_env.Environment',  # default
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
 ]
 
 WSGI_APPLICATION = 'Splicing_DNA.wsgi.application'
@@ -94,14 +94,14 @@ WSGI_APPLICATION = 'Splicing_DNA.wsgi.application'
 
 DATABASES = {
     'default': {
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'HOST': '127.0.0.1',  # 数据库主机
-        # 'PORT': 3306,  # 数据库端口
-        # # 'USER': 'django',  # 数据库用户名
-        # # 'PASSWORD': 'django',  # 数据库用户密码
-        # 'USER': 'root',  # 数据库用户名
-        # 'PASSWORD': 'root',  # 数据库用户密码
-        # 'NAME': 'mydb',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '39.99.152.217',  # 数据库主机
+        'PORT': 3306,  # 数据库端口
+        # 'USER': 'django',  # 数据库用户名
+        # 'PASSWORD': 'django',  # 数据库用户密码
+        'USER': 'django',  # 数据库用户名
+        'PASSWORD': 'jack',  # 数据库用户密码
+        'NAME': 'django',
     }
 }
 
@@ -134,9 +134,11 @@ TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
+DATETIME_FORMAT = 'Y-m-d H:i:s'
 
 USE_TZ = True
+DATE_FORMAT = 'Y-m-d'
 
 
 # Static files (CSS, JavaScript, Images)
