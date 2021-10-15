@@ -356,6 +356,7 @@
                                             <el-table v-loading="loading" :data="analyInfo" border
                                                       :row-style="{height:'26px'}"
                                                       :cell-style="{padding:3+'px'}"
+                                                      v-if="showTable"
                                                       stripe
                                                       :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
@@ -457,6 +458,7 @@
                                             <el-table v-loading="loading" :data="analyInfo1" border
                                                       :row-style="{height:'26px' }"
                                                       :cell-style="{padding:3+'px' }"
+                                                      v-if="showTable"
                                                       stripe
                                                       :header-cell-style="{padding:3+'px', fontSize:'14px'}">
 
