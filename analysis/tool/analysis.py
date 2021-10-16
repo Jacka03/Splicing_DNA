@@ -41,16 +41,16 @@ class Analysis:
         # 找到能与之对应的 index
         if index1 < self.len_g1:
             if self.len1 % 2 == 0:  # 边界
-                tem_err_list=[index1, index1 + self.len_g1, index1 + self.len_g1 + 1]
+                tem_err_list = [index1, index1 + self.len_g1, index1 + self.len_g1 + 1]
             else:
-                tem_err_list=[index1, index1 + self.len_g1]
+                tem_err_list = [index1, index1 + self.len_g1]
         else:
             if index1 == self.len_g1 + 1:
-                tem_err_list=[index1, index1 - self.len_g1]
+                tem_err_list = [index1, index1 - self.len_g1]
             elif index1 == self.len_g1 + self.len_g2 and self.len1 % 2 == 0:
-                tem_err_list=[index1, index1 - self.len_g1 - 1]
+                tem_err_list = [index1, index1 - self.len_g1 - 1]
             else:
-                tem_err_list=[index1, index1 - self.len_g1 - 1, index1 - self.len_g1]
+                tem_err_list = [index1, index1 - self.len_g1 - 1, index1 - self.len_g1]
         return tem_err_list
 
     def analysis_two(self):
@@ -106,7 +106,7 @@ class Analysis:
                 str2 = 'R{0}'.format(arr[1] - self.len_g1)
             else:
                 str2 = 'F{0}'.format(arr[1])
-            tem_info[str1+','+str2] = val
+            tem_info[str1 + ',' + str2] = val
         print(len(tem_info), tem_info)
 
         # print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
@@ -247,4 +247,3 @@ class Analysis:
         t1 = Tube(strands=strands, complexes=SetSpec(max_size=count), name='t1')  # complexes defaults to [A, B]
         tube_results = tube_analysis(tubes=[t1], model=my_model)
         print(tube_results)
-

@@ -533,6 +533,40 @@ class Splicing:
 
         return tem_index, tem_tm
 
+    def cal_for_pool(self):
+        self.gene = self.gene.upper()
+        _, tm = self.cal_next_tm()
+        index, tm = self.cal_next_tm(np.mean(tm))
+        index, tm = self.cal_next_tm(np.mean(tm))
+        # index = np.insert(index, 0, [0])
+        # print(index)
+        return index, tm  # TODO
+        pass
+
+
+    def cal_for_each_pool(self, index, tm):
+        self.gene = self.gene.upper()
+
+        # show_w(index, tm, "f")
+        # 初步贪心得到的结果，将tm取均值，然后当做起点
+
+        # show_w(index, tm, "init")
+        # 对整体遍历
+        index = np.insert(index, 0, [0])
+        index, tm = self.iteration(index, tm)
+
+        cut_of_index = self.return_result(index, tm)
+        # print(cut_of_index)
+
+        res1, res2 = self.get_gene_list(cut_of_index)
+        info = self.get_more_info(res1, res2, cut_of_index)
+
+        next_cal = [res1, res2, len(cut_of_index)]
+        # print(next_cal)
+
+        return next_cal, info
+
+
     def cal(self):
         self.gene = self.gene.upper()
         if self.result == 'res2':

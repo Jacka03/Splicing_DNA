@@ -277,14 +277,16 @@
 
                                         </div>
 
-                                        <h3>Is validation required</h3>
-                                        <el-form-item prop="validation">
-                                            <el-radio style="width: 76px" v-model="dynamicValidateForm.validation "
-                                                      label="No">No
-                                            </el-radio>
-                                            <el-radio v-model="dynamicValidateForm.validation " label="Yes">Yes
-                                            </el-radio>
-                                        </el-form-item>
+                                        <div v-if="dynamicValidateForm.pools == 1">
+                                            <h3>Is validation required</h3>
+                                            <el-form-item prop="validation">
+                                                <el-radio style="width: 76px" v-model="dynamicValidateForm.validation "
+                                                          label="No">No
+                                                </el-radio>
+                                                <el-radio v-model="dynamicValidateForm.validation " label="Yes">Yes
+                                                </el-radio>
+                                            </el-form-item>
+                                        </div>
 
 
                                         <el-form-item style="margin-top: 30px">
@@ -299,61 +301,29 @@
 
                                 {#tab1#}
                                 <el-tab-pane v-loading="loading" label="result" name="output1">
-                                    <h3>Assembly result</h3>
-                                    <el-table v-loading="loading" :data="goodsList" border
-                                              :row-style="{height:'26px'}"
-                                              :cell-style="{padding:3+'px'}"
-                                              v-if="showTable"
-                                              stripe
-                                              :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
-                                        <el-table-column v-for='(item,i) in dataColumn'
-                                                         :key="i" :label="item.name"
-                                                         :width="item.width"
-                                                         :cell-style="{padding:3+'px'}"
-                                                         show-overflow-tooltip>
-
-                                            <template slot-scope="scope">
-                                                {[ scope.row[i] ]}
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
-
-                                    {#max, min, std, range#}
-                                    <div style="padding-top: 30px">
-                                        <el-table v-loading="loading" :data="resInfo" border
+                                    <div v-if="dynamicValidateForm.pools == 1">
+                                        <h3>Assembly result</h3>
+                                        <el-table v-loading="loading" :data="goodsList" border
                                                   :row-style="{height:'26px'}"
                                                   :cell-style="{padding:3+'px'}"
                                                   v-if="showTable"
                                                   stripe
-                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
-
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="key"#}
-                                                             align="center"
-                                                             label="key"
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                            <el-table-column v-for='(item,i) in dataColumn'
+                                                             :key="i" :label="item.name"
+                                                             :width="item.width"
+                                                             :cell-style="{padding:3+'px'}"
                                                              show-overflow-tooltip>
-                                                <template slot-scope="scope">
-                                                    {[ scope.row.key ]}
-                                                </template>
-                                            </el-table-column>
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="value"#}
-                                                             align="center"
-                                                             label="value"
-                                                             show-overflow-tooltip>
                                                 <template slot-scope="scope">
-                                                    {[ scope.row.value ]}
+                                                    {[ scope.row[i] ]}
                                                 </template>
                                             </el-table-column>
                                         </el-table>
-                                    </div>
 
-                                    {#tab1 Validation#}
-                                    <div v-if="showTable1">
-                                        <h3>Validation information</h3>
-                                        <div>
-                                            <el-table v-loading="loading" :data="analyInfo" border
+                                        {#max, min, std, range#}
+                                        <div style="padding-top: 30px">
+                                            <el-table v-loading="loading" :data="resInfo" border
                                                       :row-style="{height:'26px'}"
                                                       :cell-style="{padding:3+'px'}"
                                                       v-if="showTable"
@@ -381,83 +351,180 @@
                                                 </el-table-column>
                                             </el-table>
                                         </div>
+
+                                        {#tab1 Validation#}
+                                        <div v-if="showTable1">
+                                            <h3>Validation information</h3>
+                                            <div>
+                                                <el-table v-loading="loading" :data="analyInfo" border
+                                                          :row-style="{height:'26px'}"
+                                                          :cell-style="{padding:3+'px'}"
+                                                          v-if="showTable"
+                                                          stripe
+                                                          :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="key"#}
+                                                                     align="center"
+                                                                     label="key"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.key ]}
+                                                        </template>
+                                                    </el-table-column>
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="value"#}
+                                                                     align="center"
+                                                                     label="value"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.value ]}
+                                                        </template>
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+                                        </div>
+                                        {# <el-form-item style="margin-top: 30px">#}
+                                        <div style="padding: 30px">
+                                            <el-button
+                                                    style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
+                                                    type="primary"
+                                                    @click="anotherResult(dynamicValidateForm)">another result
+                                            </el-button>
+                                            <el-button
+                                                    style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
+                                                    type="primary"
+                                                    @click="refreshTable()">Refresh table
+                                            </el-button>
+                                        </div>
                                     </div>
-                                    {# <el-form-item style="margin-top: 30px">#}
-                                    <div style="padding: 30px">
-                                        <el-button
-                                                style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
-                                                type="primary"
-                                                @click="anotherResult(dynamicValidateForm)">another result
-                                        </el-button>
-                                        <el-button
-                                                style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
-                                                type="primary"
-                                                @click="refreshTable()">Refresh table
-                                        </el-button>
+
+
+                                    {#dynamicValidateForm.pools > 1#}
+
+                                    <div v-else>
+                                        <h3>Assembly result</h3>
+                                        <div v-for="(item1, i1) in arr">
+                                            <el-table v-loading="loading" :data="item1.info" border
+                                                      :row-style="{height:'26px'}"
+                                                      :cell-style="{padding:3+'px'}"
+                                                      v-if="showTable"
+                                                      stripe
+                                                      :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                                <el-table-column v-for='(item,i) in dataColumn'
+                                                                 :key="i" :label="item.name"
+                                                                 :width="item.width"
+                                                                 :cell-style="{padding:3+'px'}"
+                                                                 show-overflow-tooltip>
+
+                                                    <template slot-scope="scope">
+                                                        {[ scope.row[i] ]}
+                                                    </template>
+                                                </el-table-column>
+                                            </el-table>
+
+                                            <div style="padding-top: 30px">
+                                                <el-table v-loading="loading" :data="item1.resInfo" border
+                                                          :row-style="{height:'26px'}"
+                                                          :cell-style="{padding:3+'px'}"
+                                                          v-if="showTable"
+                                                          stripe
+                                                          :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="key"#}
+                                                                     align="center"
+                                                                     label="key"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.key ]}
+                                                        </template>
+                                                    </el-table-column>
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="value"#}
+                                                                     align="center"
+                                                                     label="value"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.value ]}
+                                                        </template>
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+
+                                            <div v-if="item1.analyInfo">
+                                                <h3>Validation information</h3>
+                                                <div>
+                                                    <el-table v-loading="loading" :data="item1.analyInfo" border
+                                                              :row-style="{height:'26px'}"
+                                                              :cell-style="{padding:3+'px'}"
+                                                              v-if="showTable"
+                                                              stripe
+                                                              :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                                {#prop="key"#}
+                                                                         align="center"
+                                                                         label="key"
+                                                                         show-overflow-tooltip>
+                                                            <template slot-scope="scope">
+                                                                {[ scope.row.key ]}
+                                                            </template>
+                                                        </el-table-column>
+
+                                                        <el-table-column :cell-style="{padding:3+'px'}"
+                                                                {#prop="value"#}
+                                                                         align="center"
+                                                                         label="value"
+                                                                         show-overflow-tooltip>
+                                                            <template slot-scope="scope">
+                                                                {[ scope.row.value ]}
+                                                            </template>
+                                                        </el-table-column>
+                                                    </el-table>
+                                                </div>
+                                            </div>
+                                            <div v-else style="padding-bottom: 30px; padding-top: 30px">
+                                                <el-button type="primary" @click="validation(i1, item1.nextCal)">
+                                                    Validation
+                                                </el-button>
+                                            </div>
+
+                                            <el-divider></el-divider>
+                                        </div>
                                     </div>
                                 </el-tab-pane>
 
 
                                 {#tab2#}
                                 <el-tab-pane v-loading="loading" label="anoRes" name="output2">
-                                    <h3>Assembly result</h3>
-                                    <el-table v-loading="loading" :data="goodsList1" border
-                                              :row-style="{height:'26px'}"
-                                              :cell-style="{padding:3+'px'}"
-                                              v-if="showTable"
-                                              stripe
-                                              :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
-                                        <el-table-column v-for='(item,i) in dataColumn'
-                                                         :key="i" :label="item.name"
-                                                         :width="item.width"
-                                                         :cell-style="{padding:3+'px'}"
-                                                         show-overflow-tooltip>
-
-                                            <template slot-scope="scope">
-                                                {[ scope.row[i] ]}
-                                            </template>
-                                        </el-table-column>
-                                    </el-table>
-
-                                    {#max, min, std, range#}
-                                    <div style="padding-top: 30px">
-                                        <el-table v-loading="loading" :data="resInfo1" border
+                                    <div v-if="dynamicValidateForm.pools == 1">
+                                        <h3>Assembly result</h3>
+                                        <el-table v-loading="loading" :data="goodsList1" border
                                                   :row-style="{height:'26px'}"
                                                   :cell-style="{padding:3+'px'}"
                                                   v-if="showTable"
                                                   stripe
-                                                  :header-cell-style="{padding:3+'px', fontSize:'14px'}">
-
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="key"#}
-                                                             align="center"
-                                                             label="key"
+                                                  :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
+                                            <el-table-column v-for='(item,i) in dataColumn'
+                                                             :key="i" :label="item.name"
+                                                             :width="item.width"
+                                                             :cell-style="{padding:3+'px'}"
                                                              show-overflow-tooltip>
-                                                <template slot-scope="scope">
-                                                    {[ scope.row.key ]}
-                                                </template>
-                                            </el-table-column>
 
-                                            <el-table-column :cell-style="{padding:3+'px'}"
-                                                    {#prop="value"#}
-                                                             align="center"
-                                                             label="value"
-                                                             show-overflow-tooltip>
                                                 <template slot-scope="scope">
-                                                    {[ scope.row.value ]}
+                                                    {[ scope.row[i] ]}
                                                 </template>
                                             </el-table-column>
                                         </el-table>
 
-                                    </div>
-
-                                    {#tab2 Validation#}
-                                    <div v-if="showTable2">
-                                        <h3>Validation information</h3>
-                                        <div>
-                                            <el-table v-loading="loading" :data="analyInfo1" border
-                                                      :row-style="{height:'26px' }"
-                                                      :cell-style="{padding:3+'px' }"
+                                        {#max, min, std, range#}
+                                        <div style="padding-top: 30px">
+                                            <el-table v-loading="loading" :data="resInfo1" border
+                                                      :row-style="{height:'26px'}"
+                                                      :cell-style="{padding:3+'px'}"
                                                       v-if="showTable"
                                                       stripe
                                                       :header-cell-style="{padding:3+'px', fontSize:'14px'}">
@@ -482,20 +549,58 @@
                                                     </template>
                                                 </el-table-column>
                                             </el-table>
+
+                                        </div>
+
+                                        {#tab2 Validation#}
+                                        <div v-if="showTable2">
+                                            <h3>Validation information</h3>
+                                            <div>
+                                                <el-table v-loading="loading" :data="analyInfo1" border
+                                                          :row-style="{height:'26px' }"
+                                                          :cell-style="{padding:3+'px' }"
+                                                          v-if="showTable"
+                                                          stripe
+                                                          :header-cell-style="{padding:3+'px', fontSize:'14px'}">
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="key"#}
+                                                                     align="center"
+                                                                     label="key"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.key ]}
+                                                        </template>
+                                                    </el-table-column>
+
+                                                    <el-table-column :cell-style="{padding:3+'px'}"
+                                                            {#prop="value"#}
+                                                                     align="center"
+                                                                     label="value"
+                                                                     show-overflow-tooltip>
+                                                        <template slot-scope="scope">
+                                                            {[ scope.row.value ]}
+                                                        </template>
+                                                    </el-table-column>
+                                                </el-table>
+                                            </div>
+                                        </div>
+
+                                        <div style="padding: 30px">
+                                            <el-button
+                                                    style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
+                                                    type="primary"
+                                                    @click="lastResult()">Previous result
+                                            </el-button>
+                                            <el-button
+                                                    style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
+                                                    type="primary"
+                                                    @click="refreshTable()">Refresh table
+                                            </el-button>
                                         </div>
                                     </div>
-
-                                    <div style="padding: 30px">
-                                        <el-button
-                                                style="margin-right: 70px; margin-left: 120px; height: 35px!important;"
-                                                type="primary"
-                                                @click="lastResult()">Previous result
-                                        </el-button>
-                                        <el-button
-                                                style="margin-right: 70px; margin-left: 50px; height: 35px!important;"
-                                                type="primary"
-                                                @click="refreshTable()">Refresh table
-                                        </el-button>
+                                    <div v-else>
+                                        test
                                     </div>
 
                                 </el-tab-pane>
@@ -543,7 +648,7 @@
                     max_len: 30,
                     result_type: 'Gap',
                     validation: 'No',
-                    pools: 1,
+                    pools: 2,
                     tableData: [
                         {
                             name: 'Na',
@@ -615,8 +720,9 @@
                         name: 'length',
                         width: 56
                     },
-                ]
+                ],
 
+                arr: []
             };
 
         },
@@ -635,6 +741,25 @@
                 this.activeName = 'output1';
             },
 
+            validation(index, nextCal) {
+                var that = this;
+                console.log(index);
+                console.log(nextCal);
+                axios.post("/analysis/", nextCal).then(function (response) {
+
+                    that.arr[index]["analyInfo"] = response.data.analyInfoList;
+                    console.log(that.arr[index])
+                    console.log(response.data.analyInfoList);
+                    that.dynamicValidateForm.pools = 1;
+                    that.$nextTick(() => that.dynamicValidateForm.pools = 2);
+
+                }).catch(function (error) {
+
+                    console.log(error);
+                });
+
+            },
+
             refreshTable() {
                 let that = this;
                 that.showTable = false;
@@ -650,29 +775,37 @@
 
                 that.showTable1 = this.dynamicValidateForm.validation !== 'No';
                 that.showTable2 = this.showTable1;
-                {#console.log(that.showTable1);#}
-                {#console.log(that.showTable2);#}
 
-                axios.post("/assembly/", formName).then(function (response) {
-                    that.goodsList = response.data.info;
-                    that.resInfo = response.data.resInfo;
-                    that.analyInfo = response.data.analyInfoList;
-                    that.loading = false;
+                if (that.dynamicValidateForm.pools === 1) {
 
-                    that.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
-                    that.activeName = 'output1';
-                    console.log(response.data.resInfo);
+                    axios.post("/assembly/", formName).then(function (response) {
+                        that.goodsList = response.data.info;
+                        that.resInfo = response.data.resInfo;
+                        that.analyInfo = response.data.analyInfoList;
+                        that.loading = false;
 
-                }).catch(function (error) {
+                        console.log(response.data.resInfo);
+                        that.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
+                        that.activeName = 'output1';
 
-                    console.log(error);
-                });
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                } else {
+                    axios.post("/assemblyPools/", formName).then(function (response) {
 
-                {#this.handleSelect();#}
-                {#this.$nextTick(() => {#}
-                {#    this.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';#}
-                {#    this.activeName = 'output';#}
-                {# });#}
+                        that.arr = response.data.arr;
+                        that.loading = false;
+
+                        console.log(that.arr)
+                        that.$refs.tabs.$children[0].$refs.tabs[1].style.display = '';
+                        that.activeName = 'output1';
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
+
 
             },
 
@@ -702,7 +835,9 @@
             },
 
             printIndex(index, row) {
-                console.log(index, row);
+                {#console.log(index, row);#}
+
+
                 // alert(index);
             },
 
@@ -731,11 +866,3 @@
 
 </script>
 </html>
-
-<!--<script>-->
-<!--    import ElTableBody from "../static/element-ui/packages/table/src/table-body";-->
-
-<!--    export default {-->
-<!--        components: {ElTableBody}-->
-<!--    }-->
-<!--</script>-->
