@@ -17,7 +17,7 @@ class Splicing:
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene']  # 基因序列
-        self.gene_len = input_info['remnant']  # 基因序列
+        self.gene_len = input_info['geneLength']  # 基因序列
         self.res_type = input_info['result_type']  # 结果类型
         self.result = input_info['result']
 

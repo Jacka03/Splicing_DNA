@@ -153,7 +153,7 @@ class AssemblyView(View):
         # print(tem_res)
 
         context = {
-            'gene_len': data['remnant'],  # 输入的序列长度
+            'gene_len': data['geneLength'],  # 输入的序列长度
             'gene': data['gene'],  # 输入的序列
             'res_type': data['result_type'],  # 输入的序列
             'info': info.get('result'),
@@ -356,7 +356,7 @@ class AssemblyPoolsView(View):
             # print(tem_res)
             context = {}
             context = {
-                'gene_len': data['remnant'],  # 输入的序列长度
+                'gene_len': data['geneLength'],  # 输入的序列长度
                 'gene': data['gene'],  # 输入的序列
                 'res_type': data['result_type'],  # 输入的序列
                 'info': info.get('result'),

@@ -3,63 +3,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>home</title>
     <link rel="stylesheet" href="../static/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../static/css/main.css">
     <style>
 
-
     </style>
 </head>
 <body>
-<div id="app" style="width: 800px;  margin:0 auto" >
+<div id="app" style="width: 1024px; margin: auto;">
     <el-container>
         <el-main>
-            <el-row>
-                <el-col>
-                    <div class="head-style font-style">
-                        DNA assembly
-                    </div>
+            <div class="head-style font-style">
+                DNA assembly
+            </div>
 
-                    <div class="menu-style">
+            <div class="menu-style">
 
-                        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
-                                 @select="handleSelect"
-                                 background-color="#545c64"
-                                 text-color="#fff"
-                                 active-text-color="#ffd04b">
+                <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
+                         @select="handleSelect"
+                         background-color="#545c64"
+                         text-color="#fff"
+                         active-text-color="#ffd04b">
 
-                            <el-menu-item index="1" class="menu-item">
-                                <a href="home.html" target="_self">introduction</a>
-                            </el-menu-item>
+                    <el-menu-item index="1" class="menu-item">
+                        <a href="home.html" target="_self">introduction</a>
+                    </el-menu-item>
 
-                            <el-menu-item index="2" class="menu-item">
-                                <a href="assembly.html" target="_self">assembly</a>
-                            </el-menu-item>
+                    <el-menu-item index="2" class="menu-item">
+                        <a href="assembly.html" target="_self">assembly</a>
+                    </el-menu-item>
 
-                            <el-menu-item index="3" class="menu-item">
-                                <a href="doc" target="_self">doc</a>
-                            </el-menu-item>
+                    <el-menu-item index="3" class="menu-item">
+                        <a href="doc" target="_self">doc</a>
+                    </el-menu-item>
 
-                        </el-menu>
+                </el-menu>
 
-                    </div>
-                    <el-container>
+            </div>
 
-                        <div id="show" class="main-height main-style">
-                            home
-                        </div>
-                    </el-container>
+            <el-container>
 
-                    <div class="footer-style footer-font">
-                        copylight
-                    </div>
+                <div id="show" class="main-height main-style"
+                     style="background-color: #eeeeee;margin: 0">
 
-                </el-col>
-            </el-row>
+                    <el-empty description="描述文字"></el-empty>
+
+                </div>
+            </el-container>
+
+            <div class="footer-style footer-font">
+                Copyright © 2020 - 2021 Caltech. All rights reserved.
+            </div>
+
         </el-main>
-
     </el-container>
+
 </div>
 
 </body>
