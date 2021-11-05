@@ -64,3 +64,18 @@ html, body, #app {
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
 }
+
+.el-tabs__nav-wrap {
+    height: 30px;
+    line-height: 30px;
+}
+
+/*.el-tabs__nav-scroll {*/
+/*    height: 30px;*/
+/*    line-height: 30px;*/
+/*}*/
+
+.el-tabs__item {
+    height: 30px;
+    line-height: 30px;
+}
