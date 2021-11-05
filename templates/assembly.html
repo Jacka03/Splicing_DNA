@@ -75,7 +75,7 @@
                                               size="small"
                                               clearable
                                               placement="top"
-                                              v-model="dynamicValidateForm.name"
+                                              v-model="dynamicValidateForm.geneName"
                                     ></el-input>
                                     Optional.
                                 </el-form-item>
@@ -84,7 +84,7 @@
                                     <el-input
                                             clearable
                                             type="textarea" rows="4"
-                                              v-model="dynamicValidateForm.description"
+                                            v-model="dynamicValidateForm.geneDesc"
                                     >
                                     </el-input>
                                 </el-form-item>
@@ -151,32 +151,32 @@
                                 <h3>Overlap Length</h3>
                                 <el-form-item size="small">
                                     <el-col :span="8">
-                                        <el-form-item prop="min_len" label="min:"
+                                        <el-form-item prop="minLen" label="min:"
                                                       class="el-form-item_line"
                                                       required>
                                             <el-input class="input_number"
                                                       size="small"
-                                                      v-model="dynamicValidateForm.min_len"></el-input>
+                                                      v-model="dynamicValidateForm.minLen"></el-input>
                                         </el-form-item>
                                     </el-col>
 
                                     <el-col :span="8">
-                                        <el-form-item prop="max_len" label="max:"
+                                        <el-form-item prop="maxLen" label="max:"
                                                       class="el-form-item_line"
                                                       required>
                                             <el-input class="input_number"
                                                       size="small"
-                                                      v-model="dynamicValidateForm.max_len"></el-input>
+                                                      v-model="dynamicValidateForm.maxLen"></el-input>
                                         </el-form-item>
                                     </el-col>
                                 </el-form-item>
 
                                 <h3>Result Type</h3>
-                                <el-form-item prop="result_type">
-                                    <el-radio v-model="dynamicValidateForm.result_type" label="Gapless">
+                                <el-form-item prop="resultType">
+                                    <el-radio v-model="dynamicValidateForm.resultType" label="Gapless">
                                         Gapless
                                     </el-radio>
-                                    <el-radio v-model="dynamicValidateForm.result_type" label="Gap">Gap
+                                    <el-radio v-model="dynamicValidateForm.resultType" label="Gap">Gap
                                     </el-radio>
                                 </el-form-item>
 
@@ -195,20 +195,20 @@
                                 </div>
 
                                 <h3>Is Verification Required</h3>
-                                <el-form-item prop="validation">
-                                    <el-radio style="width: 76px" v-model="dynamicValidateForm.validation "
+                                <el-form-item prop="verification">
+                                    <el-radio style="width: 76px" v-model="dynamicValidateForm.verification "
                                               label="No">No
                                     </el-radio>
-                                    <el-radio v-model="dynamicValidateForm.validation " label="Yes">Yes
+                                    <el-radio v-model="dynamicValidateForm.verification " label="Yes">Yes
                                     </el-radio>
                                 </el-form-item>
 
-                                <div v-if="dynamicValidateForm.validation == 'Yes'">
+                                <div v-if="dynamicValidateForm.verification == 'Yes'">
                                     <el-form-item
                                             size="small"
                                             style="margin-left: 0px; ">
                                         <el-col :span="8">
-                                            <el-form-item prop="min_len" label="temperature:"
+                                            <el-form-item prop="temperature" label="temperature:"
                                                           class="el-form-item_line"
                                                           required>
                                                 <el-input class="input_number"
@@ -225,6 +225,7 @@
                                                 <el-input class="input_number"
                                                           size="small"
                                                           v-model="dynamicValidateForm.concentrations"></el-input>
+                                                mM
                                             </el-form-item>
                                         </el-col>
                                     </el-form-item>
@@ -275,10 +276,10 @@
                     email: '758168660@qq.com',
                     geneLen: 0,
                     result: 'res1',
-                    min_len: 20,
-                    max_len: 30,
-                    result_type: 'Gap',
-                    validation: 'Yes',
+                    minLen: 20,
+                    maxLen: 30,
+                    resultType: 'Gap',
+                    verification: 'Yes',
                     pools: 1,
                     tableData: [
                         {
@@ -317,8 +318,8 @@
                             ion: 'primer (0.1-1000nM)',
                             unit: 'mM',
                         }],
-                    name: '',
-                    description: '',
+                    geneName: 'name',
+                    geneDesc: 'description',
                     temperature: 37,
                     concentrations: 1,
                     gene: 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata'
@@ -330,7 +331,16 @@
             this.calGeneLength();
         },
 
+
         methods: {
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+
+            submitForm(formData) {
+                console.log(formData);
+
+            },
 
             calGeneLength() {
                 this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
