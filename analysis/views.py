@@ -20,19 +20,37 @@ class DownloadView(View):  # 导出excel数据
 
 
 class AssemblyView(View):
-
     def get_tableData(self, data_list):
         tableData = {}
         for data in data_list:
             tableData[data['name']] = data['data']
-        # print(tableData)
         return tableData
 
     def get(self, request):
         return render(request, 'assembly.html')
 
-    def post(self, request):
+    def get_res_info(self, info):
+        res_info = {
+            'min': info.get('min'),
+            'max': info.get('max'),
+            'range': info.get('range'),
+            'mean': info.get('mean'),
+            'std': info.get('std')
+        }
 
+        if info.get('tail'):
+            res_info['tail'] = info.get('tail')
+
+        tem_res = []
+        for key, value in res_info.items():
+            tem = {
+                'key': key,
+                'value': value,
+            }
+            tem_res.append(tem)
+        return tem_res
+
+    def post(self, request):
         data = json.loads(request.body)
 
         # print(data['validation'], data['result'])
@@ -126,49 +144,29 @@ class AssemblyView(View):
 
         ion = data.pop('tableData')
         ion = self.get_tableData(ion)
+        # add ion to data (dits)
         data.update(ion)
         data['gene'] = data['gene'].replace('\n', '').replace(' ', '').replace('\r', '')
-        models.GeneInfo.objects.create(gene=data['gene'], email=data['email'])
         # print(data)
+
+        # add to db
+        models.GeneInfo.objects.create(gene=data['gene'], email=data['email'])
+
         splic = Splicing(data)
-        # list_g1, list_g2, len1, info = splic.cal()
         next_cal, info = splic.cal()
 
-        # print(next_cal, info)
-        res_info = {
-            'min': info.get('min'),
-            'max': info.get('max'),
-            'range': info.get('range'),
-            'mean': info.get('mean'),
-            'std': info.get('std')
-        }
-        tem_res = []
-        for key, value in res_info.items():
-            tem = {
-                'key': key,
-                'value': value,
-            }
-            tem_res.append(tem)
-
-        # print(tem_res)
+        # add cal info to context
+        tem_res = self.get_res_info(info)
 
         context = {
-            'gene_len': data['geneLength'],  # 输入的序列长度
-            'gene': data['gene'],  # 输入的序列
-            'res_type': data['result_type'],  # 输入的序列
             'info': info.get('result'),
             'resInfo': tem_res,
             'nextCal': next_cal
         }
         # print(context)
-
-        if info.get('tail'):
-            context['tail'] = info.get('tail')
-
-        if data.get('validation') == 'Yes':
+        if data.get('verification') == 'Yes':
             # 分析过程
             analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
-            # info = analy.get_more_info()
             analy_info = analy.analysis_two()
             analy_info.update(analy.analysis_three())
 
@@ -178,21 +176,42 @@ class AssemblyView(View):
                     'key': key,
                     'value': value,
                 })
-            context['analyInfoList'] = analy_info_list
-            # print(context['analyInfoList'])
+            context['analyInfo'] = analy_info_list
 
-        # print(context)
+        arr = [context]
+        # print(arr)
+        context = {'arr': arr}
         return JsonResponse(context)
 
 
 class AssemblyPoolsView(View):
-
     def get_tableData(self, data_list):
         tableData = {}
         for data in data_list:
             tableData[data['name']] = data['data']
         # print(tableData)
         return tableData
+
+    def get_res_info(self, info):
+        res_info = {
+            'min': info.get('min'),
+            'max': info.get('max'),
+            'range': info.get('range'),
+            'mean': info.get('mean'),
+            'std': info.get('std')
+        }
+
+        if info.get('tail'):
+            res_info['tail'] = info.get('tail')
+
+        tem_res = []
+        for key, value in res_info.items():
+            tem = {
+                'key': key,
+                'value': value,
+            }
+            tem_res.append(tem)
+        return tem_res
 
     def post(self, request):
         data = json.loads(request.body)
@@ -337,36 +356,14 @@ class AssemblyPoolsView(View):
             splic = Splicing(data)
             next_cal, info = splic.cal_for_each_pool(index_list, tm_list)
 
-            # print(next_cal, info)
-            res_info = {
-                'min': info.get('min'),
-                'max': info.get('max'),
-                'range': info.get('range'),
-                'mean': info.get('mean'),
-                'std': info.get('std')
-            }
-            tem_res = []
-            for key, value in res_info.items():
-                tem = {
-                    'key': key,
-                    'value': value,
-                }
-                tem_res.append(tem)
+            tem_res = self.get_res_info(info)
 
-            # print(tem_res)
-            context = {}
             context = {
-                'gene_len': data['geneLength'],  # 输入的序列长度
-                'gene': data['gene'],  # 输入的序列
-                'res_type': data['result_type'],  # 输入的序列
                 'info': info.get('result'),
                 'resInfo': tem_res,
                 'nextCal': next_cal
             }
             # print(context)
-
-            if info.get('tail'):
-                context['tail'] = info.get('tail')
 
             arr.append(context)
 
@@ -410,7 +407,7 @@ class AnalysisView(View):
                 'key': key,
                 'value': value,
             })
-        context['analyInfoList'] = analy_info_list
+        context['analyInfo'] = analy_info_list
 
         return JsonResponse(context)
 

@@ -17,12 +17,12 @@ class Splicing:
     def __init__(self, input_info):
         self.input_info = input_info  # 各种离子信息
         self.gene = input_info['gene']  # 基因序列
-        self.gene_len = input_info['geneLength']  # 基因序列
-        self.res_type = input_info['result_type']  # 结果类型
+        self.gene_len = input_info['geneLen']  # 基因序列
+        self.res_type = input_info['resultType']  # 结果类型
         self.result = input_info['result']
 
-        self.min_len = int(input_info['min_len'])
-        self.max_len = int(input_info['max_len'])
+        self.min_len = int(input_info['minLen'])
+        self.max_len = int(input_info['maxLen'])
         self.count = 20
 
         self.tail = False
@@ -376,8 +376,8 @@ class Splicing:
 
         # show_w(index_list[1:], tm_list, "end")
 
-        for i in range(len(gene_list) - 1):
-            print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
+        # for i in range(len(gene_list) - 1):
+        #     print(gene_list[i + 1][1] - gene_list[i][2], end=" ")
         # print()
         return gene_list
 
@@ -486,9 +486,8 @@ class Splicing:
             'result': result
         }
         if self.tail:
-
             overlap_data['tail'] = self.gene[self.gene_len: cut_of_index[-1][2]]
-            print(overlap_data)
+            # print(overlap_data)
 
         return overlap_data
 
@@ -573,7 +572,7 @@ class Splicing:
             self.gene = self.gene[::-1]
 
         index, tm = self.cal_next_tm()
-        print(len(index))
+        # print(len(index))
 
         # show_w(index, tm, "f")
         # 初步贪心得到的结果，将tm取均值，然后当做起点
@@ -581,7 +580,7 @@ class Splicing:
 
         if len(index) % 2 == 0:  # add tail
             index, tm = self.input_tail(index, tm)
-        print(len(index))
+        # print(len(index))
 
         # show_w(index, tm, "init")
         # 对整体遍历

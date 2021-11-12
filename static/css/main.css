@@ -70,10 +70,10 @@ html, body, #app {
     line-height: 30px;
 }
 
-/*.el-tabs__nav-scroll {*/
-/*    height: 30px;*/
-/*    line-height: 30px;*/
-/*}*/
+.el-tabs__nav-scroll {
+    height: 30px;
+    line-height: 30px;
+}
 
 .el-tabs__item {
     height: 30px;

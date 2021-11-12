@@ -107,7 +107,7 @@ class Analysis:
             else:
                 str2 = 'F{0}'.format(arr[1])
             tem_info[str1 + ',' + str2] = val
-        print(len(tem_info), tem_info)
+        # print(len(tem_info), tem_info)
 
         # print("目标{0},list1:{1},list2:{2}".format(self.len1, self.len_g1, self.len_g2))
         # print("出错的{0},{1}".format(len(error), error))
