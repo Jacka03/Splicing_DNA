@@ -20,7 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('analysis.url')),
     path('assembly/', include('analysis.url')),
-    # path('assemblyPools/', include('analysis.url')),
+    path('assemblyPools/', include('analysis.url')),
     path('analysis/', include('analysis.url')),
 
 ]

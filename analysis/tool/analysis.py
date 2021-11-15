@@ -8,7 +8,7 @@ from nupack import SetSpec, RawStrand, RawComplex, Strand, Complex, Tube, tube_a
 
 class Analysis:
 
-    def __init__(self, list_g1, list_g2, len1):
+    def __init__(self, list_g1, list_g2, len1, temp, conc):
         self.list_g1 = list_g1  # 上面的基因片段
         self.list_g2 = list_g2  # 下面的基因片段
         self.gene_list = list_g1 + list_g2
@@ -19,11 +19,11 @@ class Analysis:
 
         self.len1 = len1  # 拼接前的基因片段数
 
-        self.c_gene = 1e-8  # 检验的时候反应的基因序列的浓度
+        self.c_gene = conc  # 检验的时候反应的基因序列的浓度
 
-        self.first_check = 1e-9  # 第一次验证时的浓度
+        self.first_check = conc / 10  # 第一次验证时的浓度
         self.second_check = 1e-14  # 第二次验证时的浓度
-        self.temp = 37  # 验证 时的温度
+        self.temp = temp  # 验证 时的温度
 
     def get_strands_tube_tow(self):
         # 获取试管中只有两条基因片段的所有情况

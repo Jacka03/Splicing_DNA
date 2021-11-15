@@ -24,6 +24,8 @@ class AssemblyView(View):
         tableData = {}
         for data in data_list:
             tableData[data['name']] = data['data']
+
+        tableData['Na'] = 1.2
         return tableData
 
     def get(self, request):
@@ -190,6 +192,7 @@ class AssemblyPoolsView(View):
         for data in data_list:
             tableData[data['name']] = data['data']
         # print(tableData)
+        tableData['Na'] = 1.2
         return tableData
 
     def get_res_info(self, info):
@@ -361,7 +364,9 @@ class AssemblyPoolsView(View):
             context = {
                 'info': info.get('result'),
                 'resInfo': tem_res,
-                'nextCal': next_cal
+                'nextCal': next_cal,
+                'temperature': data['temperature'],
+                'concentrations': data['concentrations']
             }
             # print(context)
 
@@ -396,7 +401,10 @@ class AnalysisView(View):
 
         # next_cal = data['nextCal']
         # 分析过程
-        analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2])
+
+        temp = next_cal[4] * 1e-8
+        print(temp)
+        analy = Analysis(next_cal[0], next_cal[1][1:], next_cal[2], next_cal[3], temp)
         analy_info = analy.analysis_two()
 
         analy_info.update(analy.analysis_three())

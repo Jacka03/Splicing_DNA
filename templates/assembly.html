@@ -14,7 +14,7 @@
     <el-container>
         <el-main>
             <div class="head-style font-style">
-                DNA assembly
+                OligoOptimizer
             </div>
 
             <div class="menu-style">
@@ -331,33 +331,71 @@
                                         </el-table-column>
                                     </el-table>
                                 </div>
-                                <div v-if="dynamicValidateForm.pools > 1 && dynamicValidateForm.verification == 'yes'"
-                                     style="padding-bottom: 30px; padding-top: 20px">
-                                    <el-button type="primary"
-                                               size="small"
-                                               style="margin-left: 435px"
-                                               @click="validation(i, item_i.nextCal)">
 
-                                        Validation
-                                    </el-button>
+                                <div
+                                        style="margin-left: 100px; margin-top: 40px;"
+                                        v-if="dynamicValidateForm.pools > 1
+                                        && dynamicValidateForm.verification == 'Yes'
+                                        && item_i.analyInfo == null">
+                                    <el-form>
+
+
+                                        <el-form-item
+                                                size="small"
+                                                style="margin-left: 0px; ">
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="temperature:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.temperature"></el-input>
+                                                    &#8451;
+                                                </el-form-item>
+                                            </el-col>
+
+                                            <el-col :span="8">
+                                                <el-form-item
+                                                        label="concentrations:"
+                                                        class="el-form-item_line"
+                                                        required>
+                                                    <el-input class="input_number"
+                                                              size="small"
+                                                              v-model="item_i.concentrations"></el-input>
+                                                    mM
+                                                </el-form-item>
+                                            </el-col>
+                                        </el-form-item>
+
+
+                                        <el-button type="primary"
+                                                   size="small"
+                                                   style="margin-left: 235px"
+                                                   @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
+
+                                            Validation
+                                        </el-button>
+                                    </el-form>
+
                                 </div>
-
-                                <div style="padding: 30px">
-                                    <el-button
-                                            style="margin-right: 70px; margin-left: 120px; "
-                                            type="primary"
-                                            size="small"
-                                            @click="anotherResult(dynamicValidateForm)">another result
-                                    </el-button>
-                                    <el-button
-                                            style="margin-right: 70px; margin-left: 50px; "
-                                            type="primary"
-                                            size="small"
-                                            @click="refreshTable()">Refresh table
-                                    </el-button>
-                                </div>
-
                             </div>
+
+
+                            {#<div style="padding: 30px">#}
+                            {#    <el-button#}
+                            {#            style="margin-right: 70px; margin-left: 120px; "#}
+                            {#            type="primary"#}
+                            {#            size="small"#}
+                            {#            @click="anotherResult(dynamicValidateForm)">another result#}
+                            {#    </el-button>#}
+                            {#    <el-button#}
+                            {#            style="margin-right: 70px; margin-left: 50px; "#}
+                            {#            type="primary"#}
+                            {#            size="small"#}
+                            {#            @click="refreshTable()">Refresh table#}
+                            {#    </el-button>#}
+                            {#</div>#}
                         </el-tab-pane>
 
 
@@ -406,12 +444,13 @@
                     verification: 'No',
                     pools: 1,
                     tableData: [
+                        {#{#}
+                        {#    name: 'Na',#}
+                        {#    data: 1.1,#}
+                        {#    ion: 'Na<sup>+</sup> (0.5-1.5M)',#}
+                        {#    unit: 'M',#}
+                        {# }, #}
                         {
-                            name: 'Na',
-                            data: 1.1,
-                            ion: 'Na<sup>+</sup> (0.5-1.5M)',
-                            unit: 'M',
-                        }, {
                             name: 'K',
                             data: 50,
                             ion: 'Na<sup>+</sup> / K<sup>+</sup> (1-1000mM)',
@@ -496,18 +535,63 @@
                 var that = this;
                 that.loading = true;
 
-                axios.post("/assembly/", formData).then(function (response) {
-                    console.log(response);
+                if (that.dynamicValidateForm.pools === 1) {
+                    axios.post("/assembly/", formData).then(function (response) {
+                        console.log(response);
 
-                    that.arr = response.data.arr;
+                        that.arr = response.data.arr;
 
-                    that.activeName = 'output1';
-                    that.output1 = true;
-                    that.loading = false;
+                        that.activeName = 'output1';
+                        that.output1 = true;
+                        that.loading = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                } else {
+                    axios.post("/assemblyPools/", formData).then(function (response) {
+                        console.log(response);
+                        console.log(that.dynamicValidateForm.verification)
+                        that.arr = response.data.arr;
+
+                        that.activeName = 'output1';
+                        that.output1 = true;
+                        that.loading = false;
+
+                    }).catch(function (error) {
+                        console.log(error);
+                    });
+                }
+
+
+            },
+
+            validation(index, nextCal, tem, concentrations) {
+                var that = this;
+
+                nextCal.push(tem);
+                nextCal.push(concentrations);
+
+                console.log(index);
+                console.log(nextCal);
+
+                axios.post("/analysis/", nextCal).then(function (response) {
+
+                    that.arr[index]["analyInfo"] = response.data.analyInfo;
+
+
+                    console.log(that.arr[index])
+                    console.log(response.data.analyInfoList);
+
+                    that.dynamicValidateForm.pools = 1;
+                    that.$nextTick(() => that.dynamicValidateForm.pools = 2);
 
                 }).catch(function (error) {
+
                     console.log(error);
                 });
+
+
             },
 
             calGeneLength() {
