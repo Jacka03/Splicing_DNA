@@ -49,8 +49,16 @@
                         <el-tab-pane label="input" name="input" v-loading="loading">
 
                             <el-form :model="dynamicValidateForm" ref="dynamicValidateForm" label-width="120px">
+                                <div style="text-align:right;">
+                                    <el-button
+                                            size="mini"
+                                            @click="testDemo()"
+                                            type="primary">
+                                        demo
+                                    </el-button>
+                                </div>
 
-                                <h3>Email Address</h3>
+                                <h3 style="margin-top: 0px;">Email Address</h3>
                                 <el-form-item
                                         size="small"
                                         prop="email"
@@ -233,18 +241,19 @@
 
                                 <el-form-item style="margin-top: 30px;">
                                     <el-button style="margin-right: 70px; margin-left: 120px;" type="primary"
-                                               size="small"
+                                               size="mini"
                                                @click="submitForm(dynamicValidateForm)">submit
                                     </el-button>
                                     <el-button type="danger"
-                                               size="small"
+                                               size="mini"
                                                @click="resetForm('dynamicValidateForm')">default
                                     </el-button>
                                 </el-form-item>
                             </el-form>
                         </el-tab-pane>
 
-                        <el-tab-pane v-if="output1" label="result" name="output1" v-loading="loading">
+                        {#output1#}
+                        <el-tab-pane v-if="output1" label="result" name="output1">
                             <h3>Assembly result</h3>
 
                             <div v-for="(item_i, i) in arr">
@@ -336,7 +345,9 @@
                                         style="margin-left: 100px; margin-top: 40px;"
                                         v-if="dynamicValidateForm.pools > 1
                                         && dynamicValidateForm.verification == 'Yes'
-                                        && item_i.analyInfo == null">
+                                        && item_i.analyInfo == null"
+                                        v-loading="valificationLoading"
+                                >
                                     <el-form>
 
                                         <el-form-item
@@ -369,7 +380,7 @@
 
 
                                         <el-button type="primary"
-                                                   size="small"
+                                                   size="mini"
                                                    style="margin-left: 235px"
                                                    @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
 
@@ -381,24 +392,40 @@
                             </div>
 
 
-                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px">
+                            <div v-if="dynamicValidateForm.pools == 1" style="padding: 30px" v-loading="another_res">
                                 <el-button
                                         style="margin-right: 70px; margin-left: 120px; "
                                         type="primary"
-                                        size="small"
+                                        size="mini"
                                         @click="anotherResult(dynamicValidateForm)">another result
                                 </el-button>
                                 <el-button
                                         style="margin-right: 70px; margin-left: 50px; "
                                         type="primary"
-                                        size="small"
+                                        size="mini"
                                         @click="refreshTable()">Refresh table
+                                </el-button>
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res1')">download
+                                </el-button>
+
+                            </div>
+                            <div v-else>
+                                <el-button
+                                        style="margin-left: 235px; margin-top: 40px;"
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res1')">download
                                 </el-button>
                             </div>
 
                         </el-tab-pane>
 
-                        <el-tab-pane v-if="output2" label="result2" name="output2" v-loading="loading">
+                        {#output2#}
+                        <el-tab-pane v-if="output2" label="result" name="output2">
                             <h3>Assembly result</h3>
 
                             <div v-for="(item_i, i) in anotherArr">
@@ -523,7 +550,7 @@
 
 
                                         <el-button type="primary"
-                                                   size="small"
+                                                   size="mini"
                                                    style="margin-left: 235px"
                                                    @click="validation(i, item_i.nextCal, item_i.temperature, item_i.concentrations)">
 
@@ -539,14 +566,21 @@
                                 <el-button
                                         style="margin-right: 70px; margin-left: 120px; "
                                         type="primary"
-                                        size="small"
+                                        size="mini"
                                         @click="lastResult()">Previous result
                                 </el-button>
                                 <el-button
                                         style="margin-right: 70px; margin-left: 50px; "
                                         type="primary"
-                                        size="small"
+                                        size="mini"
                                         @click="refreshTable()">Refresh table
+                                </el-button>
+
+                                <el-button
+                                        style="margin-right: 70px; margin-left: 50px; "
+                                        type="primary"
+                                        size="mini"
+                                        @click="download('res2')">download
                                 </el-button>
                             </div>
 
@@ -558,7 +592,7 @@
             </el-container>
 
             <div class="footer-style footer-font">
-                Copyright © 2020 - 2021 Caltech. All rights reserved.
+                Copyright © 2020 - 2021 Caltech. All rights reserved. <a href="mailto:jacka03@163.com">suggestion</a>
             </div>
 
         </el-main>
@@ -572,6 +606,7 @@
 <script src="../static/js/axios-0.18.0.js"></script>
 <script src="../static/js/jquery.min.js"></script>
 <script src="../static/element-ui/lib/index.js"></script>
+
 <script>
     new Vue({
         el: '#app',
@@ -583,12 +618,14 @@
 
                 showTable: true,
                 loading: false,
+                valificationLoading: false,
+                another_res: false,
 
                 activeIndex: 'second',
                 activeName: 'input',
 
                 dynamicValidateForm: {
-                    email: '758168660@qq.com',
+                    email: null,
                     geneLen: 0,
                     result: 'res1',
                     minLen: 20,
@@ -634,11 +671,11 @@
                             ion: 'primer (0.1-1000nM)',
                             unit: 'mM',
                         }],
-                    geneName: 'name',
-                    geneDesc: 'description',
+                    geneName: null,
+                    geneDesc: null,
                     temperature: 37,
                     concentrations: 1,
-                    gene: 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata'
+                    gene: null,
                 },
 
                 dataColumn: [
@@ -648,7 +685,7 @@
                     },
                     {
                         name: 'gene',
-                        width: 620,
+                        width: 625,
                     },
                     {
                         name: 'Tm',
@@ -656,7 +693,7 @@
                     },
                     {
                         name: 'overlap',
-                        width: 93,
+                        width: 88,
                     },
                     {
                         name: 'length',
@@ -670,11 +707,50 @@
         },
 
         created() {
-            this.calGeneLength();
+            {#this.calGeneLength();#}
         },
 
 
         methods: {
+            download(res) {
+                var that = this;
+                var input = that.arr;
+
+                if(res == 'res2') {
+                    input = that.anotherArr;
+                }
+                {#console.log(this.arr);#}
+                axios.post("/download/", input, {responseType: 'blob'}).then(function (response) {
+                    {#console.log(response);#}
+                    var time = new Date();
+                    var name = time.getFullYear().toString() + time.getMonth() + time.getDay()
+                        + time.getHours() + time.getMinutes() + time.getSeconds();
+                    const blob = new Blob([response.data]);//处理文档流
+                    const fileName = name + that.dynamicValidateForm.geneName + '.xlsx';
+                    const elink = document.createElement('a');
+                    elink.download = fileName;
+                    elink.style.display = 'none';
+                    elink.href = URL.createObjectURL(blob);
+                    document.body.appendChild(elink);
+                    elink.click();
+                    URL.revokeObjectURL(elink.href); // 释放URL 对象
+                    document.body.removeChild(elink);
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+
+            testDemo() {
+                this.dynamicValidateForm.email = '758168660@qq.com';
+                this.dynamicValidateForm.geneDesc = 'description';
+                this.dynamicValidateForm.geneName = 'name';
+                this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
+                this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
+
+                {#console.log(this.dynamicValidateForm);#}
+            },
+
             lastResult() {
                 this.activeName = 'output1';
             },
@@ -684,18 +760,40 @@
                 that.showTable = false;
                 that.$nextTick(() => that.showTable = true);
             },
+
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
 
             submitForm(formData) {
-                console.log(formData);
+                if (this.dynamicValidateForm.email == null) {
+                    this.$message({
+                            message: 'Please enter your email address',
+                            type: "warning"
+                        }
+                    );
+                    return;
+                }
+
+                if (this.dynamicValidateForm.gene == null) {
+                    this.$message({
+                        message: 'please enter the gene seq',
+                        type: "warning"
+                    });
+                    return;
+                }
+
+                {#console.log(formData);#}
                 var that = this;
                 that.loading = true;
+                that.output1 = false;
+                that.output2 = false;
+                that.arr = [];
+                that.anotherArr = [];
 
                 if (that.dynamicValidateForm.pools === 1) {
                     axios.post("/assembly/", formData).then(function (response) {
-                        console.log(response);
+                        {#console.log(response);#}
 
                         that.arr = response.data.arr;
 
@@ -708,8 +806,8 @@
                     });
                 } else {
                     axios.post("/assemblyPools/", formData).then(function (response) {
-                        console.log(response);
-                        console.log(that.dynamicValidateForm.verification)
+                        {#console.log(response);#}
+                        {#console.log(that.dynamicValidateForm.verification)#}
                         that.arr = response.data.arr;
 
                         that.activeName = 'output1';
@@ -730,35 +828,54 @@
                 nextCal.push(tem);
                 nextCal.push(concentrations);
 
-                console.log(index);
-                console.log(nextCal);
-
+                {#console.log(index);#}
+                {#console.log(nextCal);#}
+                that.valificationLoading = true;
+                that.loading = true;
                 axios.post("/analysis/", nextCal).then(function (response) {
 
                     that.arr[index]["analyInfo"] = response.data.analyInfo;
 
-
-                    console.log(that.arr[index])
-                    console.log(response.data.analyInfoList);
+                    {#console.log(that.arr[index])#}
+                    {#console.log(response.data.analyInfoList);#}
 
                     that.dynamicValidateForm.pools = 1;
                     that.$nextTick(() => that.dynamicValidateForm.pools = 2);
+
+                    that.valificationLoading = false;
+                    that.loading = false;
 
                 }).catch(function (error) {
 
                     console.log(error);
                 });
 
-
             },
 
             anotherResult(formData) {
-                if(this.anotherArr.length !== 0) {
+                if (this.anotherArr.length !== 0) {
                     this.activeName = 'output2';
 
                 } else {
                     var that = this;
+                    formData.result = 'res2';
+                    that.another_res = true;
+                    axios.post("/assembly/", formData).then(function (response) {
 
+                        {#console.log(response);#}
+                        {#console.log(that.dynamicValidateForm.verification)#}
+                        that.anotherArr = response.data.arr;
+
+                        that.activeName = 'output2';
+                        that.output2 = true;
+                        that.loading = false;
+                        that.another_res = false;
+
+                        {#that.activeName = 'output2';#}
+                    }).catch(function (error) {
+
+                        console.log(error);
+                    });
                 }
             },
 

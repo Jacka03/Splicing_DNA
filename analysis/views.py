@@ -1,8 +1,12 @@
+import io
 import json
 
+import django_excel as excel
+import pandas as pd
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.generic import View
+from openpyxl import load_workbook
 
 from analysis import models
 from analysis.tool.analysis import Analysis
@@ -13,10 +17,494 @@ from analysis.tool.splicing import Splicing
 # from analysis.tool.cal_tm import cal
 
 
+def append_df_to_excel(filename, df, sheet_name='Sheet1', startrow=None,
+                       truncate_sheet=False,
+                       **to_excel_kwargs):
+    """
+    Append a DataFrame [df] to existing Excel file [filename]
+    into [sheet_name] Sheet.
+    If [filename] doesn't exist, then this function will create it.
+    Parameters:
+      filename : File path or existing ExcelWriter
+                 (Example: '/path/to/file.xlsx')
+      df : dataframe to save to workbook
+      sheet_name : Name of sheet which will contain DataFrame.
+                   (default: 'Sheet1')
+      startrow : upper left cell row to dump data frame.
+                 Per default (startrow=None) calculate the last row
+                 in the existing DF and write to the next row...
+      truncate_sheet : truncate (remove and recreate) [sheet_name]
+                       before writing DataFrame to Excel file
+      to_excel_kwargs : arguments which will be passed to `DataFrame.to_excel()`
+                        [can be dictionary]
+    Returns: None
+    """
+
+    # ignore [engine] parameter if it was passed
+    if 'engine' in to_excel_kwargs:
+        to_excel_kwargs.pop('engine')
+
+    writer = pd.ExcelWriter(filename, engine='openpyxl')
+
+    # Python 2.x: define [FileNotFoundError] exception if it doesn't exist
+    try:
+        FileNotFoundError
+    except NameError:
+        FileNotFoundError = IOError
+
+    try:
+        # try to open an existing workbook
+        writer.book = load_workbook(filename)
+
+        # get the last row in the existing Excel sheet
+        # if it was not specified explicitly
+        if startrow is None and sheet_name in writer.book.sheetnames:
+            startrow = writer.book[sheet_name].max_row
+
+        # truncate sheet
+        if truncate_sheet and sheet_name in writer.book.sheetnames:
+            # index of [sheet_name] sheet
+            idx = writer.book.sheetnames.index(sheet_name)
+            # remove [sheet_name]
+            writer.book.remove(writer.book.worksheets[idx])
+            # create an empty sheet [sheet_name] using old index
+            writer.book.create_sheet(sheet_name, idx)
+
+        # copy existing sheets
+        writer.sheets = {ws.title: ws for ws in writer.book.worksheets}
+    except FileNotFoundError:
+        # file does not exist yet, we will create it
+        pass
+
+    if startrow is None:
+        startrow = 0
+
+    # write out the new sheet
+    df.to_excel(writer, sheet_name, startrow=startrow, **to_excel_kwargs)
+
+    # save the workbook
+    writer.save()
+
+
 class DownloadView(View):  # 导出excel数据
     def get(self, request):
         # print("test success")
         return HttpResponse("get")
+
+    # 将dataform转换成django-excel下载是的sheet
+    def dataframe_to_down_excel_data(self, dataframe, row_name=None):
+        '''
+        dataframe:需要生成Excel的数据，dataframe类型
+        row_name：自定义Excel列名，默认是dataframe的列名
+        '''
+        if row_name == None:
+            row_name = list(dataframe.columns)
+        sheet = dataframe.values
+        sheet = sheet.tolist()
+        sheet.insert(0, row_name)
+        # print(sheet)
+        return sheet
+
+    def post1(self, request):
+        # temp = json.loads(request.body)
+        tem = [
+            {
+                "info": [
+                    [
+                        "F0",
+                        "TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT",
+                        57.93,
+                        25,
+                        47
+                    ],
+                    [
+                        "R0",
+                        "ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC",
+                        57.78,
+                        22,
+                        47
+                    ],
+                    [
+                        "F1",
+                        "ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG",
+                        57.78,
+                        23,
+                        45
+                    ],
+                    [
+                        "R1",
+                        "TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC",
+                        58.08,
+                        32,
+                        55
+                    ],
+                    [
+                        "F2",
+                        "TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG",
+                        59.1,
+                        21,
+                        53
+                    ],
+                    [
+                        "R2",
+                        "TCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA",
+                        59.23,
+                        24,
+                        45
+                    ],
+                    [
+                        "F3",
+                        "CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG",
+                        59.57,
+                        20,
+                        45
+                    ],
+                    [
+                        "R3",
+                        "GTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG",
+                        58.05,
+                        15,
+                        35
+                    ],
+                    [
+                        "F4",
+                        "CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGG",
+                        59.02,
+                        18,
+                        37
+                    ],
+                    [
+                        "R4",
+                        "TCGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGC",
+                        58.62,
+                        29,
+                        47
+                    ],
+                    [
+                        "F5",
+                        "CTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGG",
+                        58.37,
+                        17,
+                        50
+                    ],
+                    [
+                        "R5",
+                        "GCGAATTGGGTACCGGGCCCCCCCTCGAGGTCGAC",
+                        58.77,
+                        18,
+                        35
+                    ],
+                    [
+                        "F6",
+                        "GCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGC",
+                        57.26,
+                        23,
+                        42
+                    ],
+                    [
+                        "R6",
+                        "AAAACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAG",
+                        58.6,
+                        19,
+                        42
+                    ],
+                    [
+                        "F7",
+                        "GCTCACTGGCCGTCGTTTT",
+                        -1,
+                        -1,
+                        19
+                    ],
+                    [
+                        "F_Primer",
+                        "TAAGCACCTGTAGGATCGTACA",
+                        56.12,
+                        -1,
+                        22
+                    ],
+                    [
+                        "R_Primer",
+                        "AAAACGACGGCCAGTGAGC",
+                        58.6,
+                        -1,
+                        19
+                    ]
+                ],
+                "resInfo": [
+                    {
+                        "key": "min",
+                        "value": 57.26
+                    },
+                    {
+                        "key": "max",
+                        "value": 59.57
+                    },
+                    {
+                        "key": "range",
+                        "value": 2.31
+                    },
+                    {
+                        "key": "mean",
+                        "value": 58.44
+                    },
+                    {
+                        "key": "std",
+                        "value": 0.64
+                    }
+                ],
+                "nextCal": [
+                    [
+                        "TAAGCACCTGTAGGATCGTACAGGTTTACGCAAGAAAATGGTTTGTT",
+                        "ATAGTCGAATAACACCGTGCGTGTTGACTATTTTACCTCTGGCGG",
+                        "TGATATACTAGAGAAAGAGGAGAAATACTAGATGACCATGATTACGCCAAGCG",
+                        "CGCAATTAACCCTCACTAAAGGGAACAAAAGCTGGAGCTCCACCG",
+                        "CGGTGGCGGCAGCACTAGAGCTAGTGGATCCCCCGGG",
+                        "CTGTAGAAATTCGATATCAAGCTTATCGATACCGTCGACCTCGAGGGGGG",
+                        "GCCCGGTACCCAATTCGCCCTATAGTGAGTCGTATTACGCGC",
+                        "GCTCACTGGCCGTCGTTTT"
+                    ],
+                    [
+                        "TGTACGATCCTACAGGTGCTTA",
+                        "ACGCACGGTGTTATTCGACTATAACAAACCATTTTCTTGCGTAAACC",
+                        "TCTAGTATTTCTCCTCTTTCTCTAGTATATCACCGCCAGAGGTAAAATAGTCAAC",
+                        "TCCCTTTAGTGAGGGTTAATTGCGCGCTTGGCGTAATCATGGTCA",
+                        "GTGCTGCCGCCACCGCGGTGGAGCTCCAGCTTTTG",
+                        "TCGATAAGCTTGATATCGAATTTCTACAGCCCGGGGGATCCACTAGC",
+                        "GCGAATTGGGTACCGGGCCCCCCCTCGAGGTCGAC",
+                        "AAAACGACGGCCAGTGAGCGCGCGTAATACGACTCACTATAG"
+                    ],
+                    15,
+                    37,
+                    1
+                ],
+                "temperature": 37,
+                "concentrations": 1,
+                "analyInfo": [
+                    {
+                        "key": "R3,R3",
+                        "value": 2.2331817537022e-9
+                    }
+                ]
+            },
+            {
+                "info": [
+                    [
+                        "F0",
+                        "ACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGC",
+                        59.47,
+                        22,
+                        43
+                    ],
+                    [
+                        "R0",
+                        "GAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCA",
+                        60.03,
+                        21,
+                        43
+                    ],
+                    [
+                        "F1",
+                        "CTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCG",
+                        59.36,
+                        19,
+                        40
+                    ],
+                    [
+                        "R1",
+                        "CGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGC",
+                        60.56,
+                        17,
+                        38
+                    ],
+                    [
+                        "F2",
+                        "GAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGC",
+                        59.7,
+                        19,
+                        36
+                    ],
+                    [
+                        "R2",
+                        "GCACTATCAGCGTTATTATTCAGGCTGCGCAACTGTTGGGAAGGG",
+                        60.1,
+                        26,
+                        45
+                    ],
+                    [
+                        "F3",
+                        "AGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAG",
+                        59.51,
+                        24,
+                        51
+                    ],
+                    [
+                        "R3",
+                        "ACTGAGCCTTTCGTTTTATTTGATGCCTGGCTCTAGTAGCGATCTACACT",
+                        59.53,
+                        26,
+                        50
+                    ],
+                    [
+                        "F4",
+                        "GCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATC",
+                        59.31,
+                        25,
+                        52
+                    ],
+                    [
+                        "R4",
+                        "GAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTTC",
+                        60.04,
+                        22,
+                        47
+                    ],
+                    [
+                        "F5",
+                        "TGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCAC",
+                        59.58,
+                        24,
+                        46
+                    ],
+                    [
+                        "R5",
+                        "GTGAGCCAGTGTGACTCTAGTAGA",
+                        -1,
+                        -1,
+                        24
+                    ],
+                    [
+                        "F_Primer",
+                        "ACGTCGTGACTGGGAAAACCC",
+                        60.75,
+                        -1,
+                        21
+                    ],
+                    [
+                        "R_Primer",
+                        "GTGAGCCAGTGTGACTCTAGTAGA",
+                        59.58,
+                        -1,
+                        24
+                    ]
+                ],
+                "resInfo": [
+                    {
+                        "key": "min",
+                        "value": 59.31
+                    },
+                    {
+                        "key": "max",
+                        "value": 60.56
+                    },
+                    {
+                        "key": "range",
+                        "value": 1.25
+                    },
+                    {
+                        "key": "mean",
+                        "value": 59.74
+                    },
+                    {
+                        "key": "std",
+                        "value": 0.37
+                    }
+                ],
+                "nextCal": [
+                    [
+                        "ACGTCGTGACTGGGAAAACCCTGGCGTTACCCAACTTAATCGC",
+                        "CTTGCAGCACATCCCCCTTTCGCCAGCTGGCGTAATAGCG",
+                        "GAGGCCCGCACCGATCGCCCTTCCCAACAGTTGCGC",
+                        "AGCCTGAATAATAACGCTGATAGTGCTAGTGTAGATCGCTACTAGAGCCAG",
+                        "GCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATC",
+                        "TGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCAC"
+                    ],
+                    [
+                        "GGGTTTTCCCAGTCACGACGT",
+                        "GAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCA",
+                        "CGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGC",
+                        "GCACTATCAGCGTTATTATTCAGGCTGCGCAACTGTTGGGAAGGG",
+                        "ACTGAGCCTTTCGTTTTATTTGATGCCTGGCTCTAGTAGCGATCTACACT",
+                        "GAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTTC",
+                        "GTGAGCCAGTGTGACTCTAGTAGA"
+                    ],
+                    12,
+                    37,
+                    1
+                ],
+                "temperature": 37,
+                "concentrations": 1,
+                "analyInfo": [
+                    {
+                        "key": "R3,R4",
+                        "value": 9.431655267831329e-9
+                    },
+                    {
+                        "key": "F1,F1",
+                        "value": 1.59819647082676e-9
+                    },
+                    {
+                        "key": "R1,R1",
+                        "value": 1.2373248757553285e-9
+                    },
+                    {
+                        "key": "F3,R3,R4",
+                        "value": 9.896767050641333e-9
+                    },
+                    {
+                        "key": "F5,R3,R4",
+                        "value": 9.116376180804208e-9
+                    }
+                ]
+            }
+        ]
+        info = tem[0]['info']
+        data = pd.DataFrame(data=info, columns=['index', 'gene', 'tm', 'overlap', 'length'])
+        # print(data)
+        data_excel = self.dataframe_to_down_excel_data(data)
+        column_names = []
+        return excel.make_response_from_query_sets(data_excel, column_names, "xlsx", status=200, sheet_name='测试',
+                                                   file_name='测试文件')
+
+    def post(self, request):
+        tem = json.loads(request.body)
+        output = io.BytesIO()  # 配置一个BytesIO 这个是为了转二进制流
+        count = 0
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            for i in range(len(tem)):
+                # pool
+                data = pd.DataFrame(data=['pool:{0}'.format(i + 1)])
+                data.to_excel(writer, startrow=count, index=False, header=None)
+                count += 1
+
+                # analysis result
+                res_info = tem[i]['resInfo']
+                data = pd.DataFrame(data=res_info)
+                data.to_excel(writer, startrow=count, startcol=6, index=False)
+
+                if 'analyInfo' in tem[i]:
+                    # analysis result
+                    analy_info = tem[i]['analyInfo']
+                    data = pd.DataFrame(data=analy_info)
+                    data.to_excel(writer, startrow=count, startcol=9, index=False)
+
+                # result
+                info = tem[i]['info']
+                data = pd.DataFrame(data=info, columns=['index', 'gene', 'tm', 'overlap', 'length'])
+                data.to_excel(writer, startrow=count, index=False)
+                count += data.shape[0] + 2
+
+        # data.to_excel(output, index=False)  # index=False 是为了不建立索引
+        # append_df_to_excel(data, output, sheet_name='Sheet1', startcol=10,startrow=0,index=False)
+        output.seek(0)  # 把游标归0
+
+        response = HttpResponse()  # 创建一个HttpResponse
+        # response["Content-Type"] = "application/vnd.ms-excel"  # 类型
+        file_name = 'comment.xlsx'  # 文件名称 自定义
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="{0}"'.format(file_name)
+        response.write(output.getvalue())  # 写入数据
+        output.close()  # 关闭
+        return response  # 返回
 
 
 class AssemblyView(View):
