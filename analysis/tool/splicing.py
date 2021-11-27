@@ -417,6 +417,7 @@ class Splicing:
         for i, tem_gene in enumerate(list_g1):  # 先计算上面的单链
             ind = 'F{0}'.format(i)
             if i * 2 + 1 >= len(cut_of_index):
+                # continue
                 overlap = -1
                 tem_tm = -1
             else:
@@ -425,9 +426,15 @@ class Splicing:
             # index， gene， len_gene， gene_tm， overlap
             info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])
 
+        x1 = len(info)
+        # if info[-1][2] == -1:
+        #     del(info[-1])
+            # pass
+
         for i, tem_gene in enumerate(list_g2):  # 计算下面的单链
             ind = 'R{0}'.format(i)
             if i * 2 >= len(cut_of_index) or i == 0:
+                # continue
                 overlap = -1
                 tem_tm = -1
             else:
@@ -435,7 +442,9 @@ class Splicing:
                 tem_tm = round(self.cal_tm(tem_gene[:overlap]), 2)
             info.append([ind, tem_gene, tem_tm, overlap, len(tem_gene)])  # , Splicing.cal_tm(tem_gene)
 
+        x2 = len(info) - x1
         count_cut = len(cut_of_index)
+
         # out = []  # 这两条连的是不需要计算tm的
         if count_cut % 2 == 0:
             out = [count_cut / 2, count_cut]
@@ -447,15 +456,16 @@ class Splicing:
             if i not in out:
                 data.append(ele[2])
 
-        x = [i for i in range(len(data))]
+        # x = [i for i in range(len(data))]
         # show_w(x, data, "Splicing")
 
         len_g1 = len(list_g1)
         len_g2 = len(list_g2)
         len_info = len(info)
         result = []
+        print(len_g1, len_g2, x1, x2)
         for i in range(max(len_g1, len_g2)):
-            if i < len_g1:
+            if i < len_g1-1:
                 result.append(info[i])
             if len_g1 + i + 1 < len_info:
                 tem = info[len_g1 + i + 1]
@@ -466,15 +476,15 @@ class Splicing:
         # 第一段 可以写死
         len1 = info[0][4] - info[0][3]
         f_gene = info[0][1][:len1]
-        result.append(["F_Primer", f_gene, round(self.cal_tm(f_gene), 2), -1, len1])
+        result.append(["F_Primer", f_gene, round(self.cal_tm(f_gene), 2), '', len1])
 
         # len1 = info[-1][2] - info[-1][4]
         if len_g1 != len_g2:
-            result.append(["R_Primer", info[-1][1], round(self.cal_tm(info[-1][1]), 2), -1, len(info[-1][1])])
+            result.append(["R_Primer", info[-1][1], round(self.cal_tm(info[-1][1]), 2), '', len(info[-1][1])])
         else:
             len1 = info[-1][3]
             f_gene = info[-1][1]
-            result.append(["R_Primer", f_gene[:len1], round(self.cal_tm(f_gene[:len1]), 2), -1, info[-1][3]])
+            result.append(["R_Primer", f_gene[:len1], round(self.cal_tm(f_gene[:len1]), 2), '', info[-1][3]])
 
         # overlap的信息
         overlap_data = {

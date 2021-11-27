@@ -710,23 +710,46 @@
             {#this.calGeneLength();#}
         },
 
-
         methods: {
+
+
+            dateFormat(fmt, date) {
+                let ret;
+                const opt = {
+                    "Y+": date.getFullYear().toString(),        // 年
+                    "m+": (date.getMonth() + 1).toString(),     // 月
+                    "d+": date.getDate().toString(),            // 日
+                    "H+": date.getHours().toString(),           // 时
+                    "M+": date.getMinutes().toString(),         // 分
+                    "S+": date.getSeconds().toString()          // 秒
+                    // 有其他格式化字符需求可以继续添加，必须转化成字符串
+                };
+
+                for (let k in opt) {
+                    ret = new RegExp("(" + k + ")").exec(fmt);
+                    if (ret) {
+                        fmt = fmt.replace(ret[1], (ret[1].length === 1) ? (opt[k]) : (opt[k].padStart(ret[1].length, "0")))
+                    }
+
+                }
+
+                return fmt;
+            },
+
             download(res) {
                 var that = this;
                 var input = that.arr;
 
-                if(res == 'res2') {
+                if (res == 'res2') {
                     input = that.anotherArr;
                 }
                 {#console.log(this.arr);#}
                 axios.post("/download/", input, {responseType: 'blob'}).then(function (response) {
                     {#console.log(response);#}
-                    var time = new Date();
-                    var name = time.getFullYear().toString() + time.getMonth() + time.getDay()
-                        + time.getHours() + time.getMinutes() + time.getSeconds();
+                    var time = that.dateFormat("YYYY-mm-dd-HH:MM", new Date());
+                    {#console.log(time);#}
                     const blob = new Blob([response.data]);//处理文档流
-                    const fileName = name + that.dynamicValidateForm.geneName + '.xlsx';
+                    const fileName = that.dynamicValidateForm.geneName + "_" + time + '.xlsx';
                     const elink = document.createElement('a');
                     elink.download = fileName;
                     elink.style.display = 'none';
@@ -748,7 +771,8 @@
                 this.dynamicValidateForm.gene = 'taagcacctgtaggatcgtacaggtttacgcaagaaaatggtttgttatagtcgaataacaccgtgcgtgttgactattttacctctggcggtgatatactagagaaagaggagaaatactagatgaccatgattacgccaagcgcgcaattaaccctcactaaagggaacaaaagctggagctccaccgcggtggcggcagcactagagctagtggatcccccgggctgtagaaattcgatatcaagcttatcgataccgtcgacctcgagggggggcccggtacccaattcgccctatagtgagtcgtattacgcgcgctcactggccgtcgttttacaacgtcgtgactgggaaaaccctggcgttacccaacttaatcgccttgcagcacatccccctttcgccagctggcgtaatagcgaagaggcccgcaccgatcgcccttcccaacagttgcgcagcctgaataataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttata';
                 this.dynamicValidateForm.geneLen = this.dynamicValidateForm.gene.length;
 
-                {#console.log(this.dynamicValidateForm);#}
+                {#var date = new Date();#}
+                {#console.log(this.dateFormat("YYYY-mm-dd_HH:MM", date))#}
             },
 
             lastResult() {

@@ -128,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -148,6 +148,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     Path(BASE_DIR, 'static'),
 ]
+
+# STATIC_ROOT = '/data/Splicing_DNA/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
