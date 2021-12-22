@@ -149,8 +149,9 @@
                                                               size="small"
                                                               style="margin-left: -110px;"
                                                               type='number'
-                                                              v-model.number="scope.row.data">{[scope.row.unit]}
+                                                              v-model.number="scope.row.data">
                                                     </el-input>
+                                                    {[scope.row.unit]}
 
                                                 </el-form-item>
                                             </template>
@@ -166,6 +167,7 @@
                                                       required>
                                             <el-input class="input_number"
                                                       size="small"
+                                                      type='number'
                                                       v-model="dynamicValidateForm.minLen"></el-input>
                                         </el-form-item>
                                     </el-col>
@@ -176,6 +178,7 @@
                                                       required>
                                             <el-input class="input_number"
                                                       size="small"
+                                                      type='number'
                                                       v-model="dynamicValidateForm.maxLen"></el-input>
                                         </el-form-item>
                                     </el-col>
@@ -199,6 +202,7 @@
                                                   required>
                                         <el-input class="input_number"
                                                   size="small"
+                                                  type='number'
                                                   v-model="dynamicValidateForm.pools"></el-input>
                                     </el-form-item>
 
@@ -223,6 +227,7 @@
                                                           required>
                                                 <el-input class="input_number"
                                                           size="small"
+                                                          type='number'
                                                           v-model="dynamicValidateForm.temperature"></el-input>
                                                 &#8451;
                                             </el-form-item>
@@ -234,6 +239,7 @@
                                                           required>
                                                 <el-input class="input_number"
                                                           size="small"
+                                                          type='number'
                                                           v-model="dynamicValidateForm.concentrations"></el-input>
                                                 mM
                                             </el-form-item>
@@ -677,12 +683,12 @@
                             name: 'oligo',
                             data: 10,
                             ion: 'oligo (0.1-1000nM)',
-                            unit: 'mM',
+                            unit: 'nM',
                         }, {
                             name: 'primer',
                             data: 400,
                             ion: 'primer (0.1-1000nM)',
-                            unit: 'mM',
+                            unit: 'nM',
                         }],
                     geneName: null,
                     geneDesc: null,
@@ -873,7 +879,7 @@
                         that.loading = false;
 
                     }).catch(function (error) {
-                        alert("server error");
+                        alert("server error:" + error);
                         that.loading = false;
                         console.log(error);
                     });

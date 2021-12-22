@@ -146,7 +146,7 @@ class Analysis:
                 for i in range(len(list1)):
                     set_t.add(name_list[i][2])
                 if len(set_t) == len(list1) and set_t == set1:  # 只关注错配的那几条
-                    print(name, conc)
+                    # print(name, conc)
                     return False
                 # print(name, conc)
 
@@ -246,4 +246,4 @@ class Analysis:
         my_model = Model(material='dna', celsius=self.temp)
         t1 = Tube(strands=strands, complexes=SetSpec(max_size=count), name='t1')  # complexes defaults to [A, B]
         tube_results = tube_analysis(tubes=[t1], model=my_model)
-        print(tube_results)
+        # print(tube_results)
