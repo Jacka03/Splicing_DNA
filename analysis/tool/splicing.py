@@ -73,7 +73,7 @@ class Splicing:
         c_Tris = self.input_info['Tris'] / 1000  # mol / L#
 
         c_oligo = self.input_info['oligo'] / 1e9  # 寡核苷酸
-        c_t = self.input_info['primer'] / 1e9  # 引物
+        c_t = self.input_info['primer'] / 1e9  # 引物cd
 
         # TODO 当premer不是远大于oligo时，c_t需要重新计算
 
@@ -188,6 +188,8 @@ class Splicing:
                     tem_tm = self.cal_tm(self.gene[fir_cut: sec_cut])  # 计算这段gene的tm
                     bef_tm = result[i, 1::2]  # 取出前面所有tm
                     bef_tm = np.append(bef_tm, tem_tm)  # 将这段gene的tm添加到之前中
+                    if tm_mea != 0.:
+                        bef_tm = np.append(bef_tm, tm_mea)  # 将这段gene的tm添加到之前中
                     tm_std = np.std(bef_tm)  # 计算标准差
                     bef_arr = result[i, :]  # 获取数组，转化为列表
                     bef_arr = bef_arr.tolist()
@@ -575,7 +577,6 @@ class Splicing:
 
         return next_cal, info
 
-
     def cal(self):
         self.gene = self.gene.upper()
         if self.result == 'res2':
@@ -587,6 +588,7 @@ class Splicing:
         # show_w(index, tm, "f")
         # 初步贪心得到的结果，将tm取均值，然后当做起点
         index, tm = self.cal_next_tm(float(np.mean(tm)))
+        # show_w(index, tm, "f")
 
         if len(index) % 2 == 0:  # add tail
             index, tm = self.input_tail(index, tm)

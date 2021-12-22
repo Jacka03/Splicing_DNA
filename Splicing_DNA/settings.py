@@ -95,13 +95,15 @@ WSGI_APPLICATION = 'Splicing_DNA.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '39.99.152.217',  # 数据库主机
+        'HOST': 'rm-bp14u7355cr17d2fv2o.mysql.rds.aliyuncs.com',  # 数据库主机
         'PORT': 3306,  # 数据库端口
-        # 'USER': 'django',  # 数据库用户名
-        # 'PASSWORD': 'django',  # 数据库用户密码
         'USER': 'django',  # 数据库用户名
-        'PASSWORD': 'jack',  # 数据库用户密码
+        'PASSWORD': '6IWq7rd3@J',  # 数据库用户密码
         'NAME': 'django',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4'
+        }
     }
 }
 
@@ -146,9 +148,9 @@ DATE_FORMAT = 'Y-m-d'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
+    #
     Path(BASE_DIR, 'static'),
 ]
-
 # STATIC_ROOT = '/data/Splicing_DNA/static/'
 
 # Default primary key field type

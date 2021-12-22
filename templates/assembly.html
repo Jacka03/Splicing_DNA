@@ -24,15 +24,15 @@
                          active-text-color="#ffd04b">
 
                     <el-menu-item index="first" class="menu-item">
-                        <a href="home.html" target="_self">introduction</a>
+                        <a href="#" target="_self">introduction</a>
                     </el-menu-item>
 
                     <el-menu-item index="second" class="menu-item">
-                        <a href="assembly.html" target="_self">assembly</a>
+                        <a href="#" target="_self">home</a>
                     </el-menu-item>
 
                     <el-menu-item index="third" class="menu-item">
-                        <a href="doc" target="_self">doc</a>
+                        <a href="#" target="_self">doc</a>
                     </el-menu-item>
 
                 </el-menu>
@@ -148,8 +148,10 @@
                                                     <el-input class="input_number"
                                                               size="small"
                                                               style="margin-left: -110px;"
-                                                              v-model="scope.row.data"></el-input>
-                                                    {[scope.row.unit]}
+                                                              type='number'
+                                                              v-model.number="scope.row.data">{[scope.row.unit]}
+                                                    </el-input>
+
                                                 </el-form-item>
                                             </template>
                                         </el-table-column>
@@ -254,9 +256,10 @@
 
                         {#output1#}
                         <el-tab-pane v-if="output1" label="result" name="output1">
-                            <h3>Assembly result</h3>
+                            <h3>result</h3>
 
                             <div v-for="(item_i, i) in arr">
+                                {#result#}
                                 <el-divider content-position="left">
                                     pool:
                                     <span>{[ i+1 ]}</span>
@@ -268,12 +271,22 @@
                                           stripe
                                           :header-cell-style="{padding:3+'px', fontSize:'14px', align:'center'}">
                                     <el-table-column v-for='(item_j,j) in dataColumn'
-                                                     :key="j" :label="item_j.name"
+                                                     :key="j"
+                                                     :label="item_j.name"
                                                      :width="item_j.width"
                                                      :cell-style="{padding:3+'px'}"
                                                      show-overflow-tooltip>
                                         <template slot-scope="scope">
-                                            {[ scope.row[j] ]}
+                                            {#TODO#}
+                                            {#{[ scope.row[j] ]}#}
+                                            {#<span v-if="">#}
+                                            {#    {[ scope.row[j] ]}#}
+                                            {#</span>     #}
+                                            {#<p v-html>#}
+                                            {#    {[ scope.row[j] ]}#}
+                                            {#</p>#}
+                                            <span v-html="scope.row[j]" @click="test(arr)"></span>
+
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -426,7 +439,7 @@
 
                         {#output2#}
                         <el-tab-pane v-if="output2" label="result" name="output2">
-                            <h3>Assembly result</h3>
+                            <h3>result</h3>
 
                             <div v-for="(item_i, i) in anotherArr">
                                 <el-divider content-position="left">
@@ -591,9 +604,9 @@
                 </div>
             </el-container>
 
-            <div class="footer-style footer-font">
-                Copyright © 2020 - 2021 Caltech. All rights reserved. <a href="mailto:jacka03@163.com">suggestion</a>
-            </div>
+            {#<div class="footer-style footer-font">#}
+            {#    Copyright © 2020 - 2021 Caltech. All rights reserved. <a href="mailto:jacka03@163.com">suggestion</a>#}
+            {#</div>#}
 
         </el-main>
     </el-container>
@@ -712,6 +725,34 @@
 
         methods: {
 
+            test(resArr) {
+                // view tail
+                source = resArr[resArr.length - 1];
+                {#TODO#}
+                endTail = "";
+                if (source.resInfo[5] != undefined) {
+                    var tail = source.resInfo[5].value
+                    tail = tail.split("").reverse().join("")
+                    endTail = "";
+                    for (var i = 0; i < tail.length; i++) {
+                        if (tail[i] == 'A') {
+                            endTail += 'T';
+                        } else if (tail[i] == 'T') {
+                            endTail += 'A';
+                        } else if (tail[i] == 'C') {
+                            endTail += 'G';
+                        } else if (tail[i] == 'G') {
+                            endTail += 'C';
+                        }
+                    }
+                }
+                replaceStr = '<span style="color:red;">' + endTail + '</span>';
+                index = resArr[resArr.length - 1]["info"].length - 3;
+                str = resArr[resArr.length - 1]["info"][index][1];
+                str = str.replace(endTail, replaceStr);
+                resArr[resArr.length - 1]["info"][index][1] = str;
+                return resArr;
+            },
 
             dateFormat(fmt, date) {
                 let ret;
@@ -760,6 +801,7 @@
                     document.body.removeChild(elink);
 
                 }).catch(function (error) {
+                    alert("server error");
                     console.log(error);
                 });
             },
@@ -806,26 +848,33 @@
                     });
                     return;
                 }
+                var that = this;
 
                 {#console.log(formData);#}
-                var that = this;
                 that.loading = true;
                 that.output1 = false;
                 that.output2 = false;
                 that.arr = [];
                 that.anotherArr = [];
 
+                {#console.log(that.dynamicValidateForm.tableData)#}
+
                 if (that.dynamicValidateForm.pools === 1) {
                     axios.post("/assembly/", formData).then(function (response) {
                         {#console.log(response);#}
 
                         that.arr = response.data.arr;
+                        that.arr = that.test(that.arr)
+                        {#console.log(that.arr);#}
+                        {#that.arr[that.arr.length-1]["info"][26][1] = "<font color=red >aa</font>"#}
 
                         that.activeName = 'output1';
                         that.output1 = true;
                         that.loading = false;
 
                     }).catch(function (error) {
+                        alert("server error");
+                        that.loading = false;
                         console.log(error);
                     });
                 } else {
@@ -833,17 +882,19 @@
                         {#console.log(response);#}
                         {#console.log(that.dynamicValidateForm.verification)#}
                         that.arr = response.data.arr;
+                        that.arr = that.test(that.arr)
 
                         that.activeName = 'output1';
                         that.output1 = true;
                         that.loading = false;
 
                     }).catch(function (error) {
+                        alert("server error");
+                        that.loading = false;
                         console.log(error);
                     });
                 }
-
-
+                {#that.test();#}
             },
 
             validation(index, nextCal, tem, concentrations) {
@@ -870,7 +921,8 @@
                     that.loading = false;
 
                 }).catch(function (error) {
-
+                    alert("server error");
+                    that.loading = false;
                     console.log(error);
                 });
 
@@ -889,6 +941,8 @@
                         {#console.log(response);#}
                         {#console.log(that.dynamicValidateForm.verification)#}
                         that.anotherArr = response.data.arr;
+                        that.anotherArr = that.test(that.anotherArr)
+                        console.log(that.anotherArr)
 
                         that.activeName = 'output2';
                         that.output2 = true;
@@ -897,7 +951,9 @@
 
                         {#that.activeName = 'output2';#}
                     }).catch(function (error) {
-
+                        alert("server error");
+                        that.loading = false;
+                        that.another_res = false;
                         console.log(error);
                     });
                 }
